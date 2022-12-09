@@ -1,10 +1,10 @@
 VALID_CHOICES = %w(rock paper scissors spock lizard)
 
-VALID_CHOICES_EXPLANATION = ['r - rock',
-                             'p - paper',
-                             'sc - scissors',
-                             'sp - spock',
-                             'l - lizard']
+VALID_CHOICES_ABR = ['r - rock',
+                     'p - paper',
+                     'sc - scissors',
+                     'sp - spock',
+                     'l - lizard']
 
 WIN_CONDITIONS = {
   rock: ['scissors', 'lizard'],
@@ -14,7 +14,7 @@ WIN_CONDITIONS = {
   lizard: ['paper', 'spock']
 }
 
-VALID_CHOICES_ABR = {
+WIN_CONDITIONS_ABR = {
   r: 'rock',
   p: 'paper',
   sc: 'scissors',
@@ -36,25 +36,14 @@ def display_results(player, computer)
   end
 end
 
-def abbreviation_conversion(abr)
-  case abr
-  when 'r' then :rock
-  when 'p' then :paper
-  when 'sc' then :scissors
-  when 'sp' then :spock
-  when 'l' then :lizard
-  end
-end
-
 player_score = 0
 computer_score = 0
 player_wins = 0
 computer_wins = 0
 
-prompt "Welcome to Rock Paper Scisors Spock Lizard!"
-prompt "A fresh take on the classic game."
-prompt "It works the same as classic Rock Paper Scisors, with the addition"
-prompt "of 2 new options, Spock and Lizard."
+
+prompt "Welcome to Rock Paper Scisors Spock Lizard! A fresh take on the classic game."
+prompt "It works the same as classic Rock Paper Scisors, with the addition of 2 new options, Spock and Lizard."
 prompt "The rules are as follows:"
 prompt "Rock crushes scissors and lizard."
 prompt "Paper covers rock and disproves Spock."
@@ -71,31 +60,34 @@ loop do # loop to start new game
   loop do # main game loop
     choice = ''
     loop do
-      prompt "Choose one: #{VALID_CHOICES_EXPLANATION.join(', ')}"
+      prompt "Choose one: #{VALID_CHOICES_ABR.join(', ')}" 
       choice = gets.chomp.downcase
 
-      if VALID_CHOICES_ABR.key?(choice.to_sym)
-        prompt "You chose: #{abbreviation_conversion(choice)}."
-        choice = abbreviation_conversion(choice)
-        break
-      elsif VALID_CHOICES_ABR.value?(choice.to_s)
-        prompt "You chose #{choice}"
-        choice = choice.to_sym
+      if WIN_CONDITIONS_ABR.key?(choice.to_sym)
         break
       else
         prompt("That's not a valid choice.")
       end
     end
 
+    choice_conversion = case choice #Turn this into a method and also make one to conver the other way, so you can have them type the full word instead of just the first letter
+                        when 'r' then :rock
+                        when 'p' then :paper
+                        when 'sc' then :scissors
+                        when 'sp' then :spock
+                        when 'l' then :lizard
+                        end
+
     computer_choice = VALID_CHOICES.sample
 
+    prompt "You chose: #{choice_conversion}"
     prompt "The computer chose #{computer_choice}."
 
-    display_results(choice, computer_choice)
+    display_results(choice_conversion, computer_choice)
 
-    if WIN_CONDITIONS[choice].include?(computer_choice)
+    if WIN_CONDITIONS[choice_conversion].include?(computer_choice) #Method?
       player_score += 1
-    elsif WIN_CONDITIONS[computer_choice.to_sym].include?(choice.to_s)
+    elsif WIN_CONDITIONS[computer_choice.to_sym].include?(choice_conversion.to_s)
       computer_score += 1
     end
 
@@ -120,7 +112,7 @@ loop do # loop to start new game
 
   puts # blank line to break up games
   prompt "The game record is Player: #{player_wins} wins. Computer: #{computer_wins} wins."
-  prompt "Do you want to play again? (y to play again)"
+  prompt "Do you want to play again? (y to play again)" #
   answer = gets.chomp
   break unless answer.downcase.start_with? 'y'
   system('clear')
@@ -132,6 +124,7 @@ end
 prompt "Thanks for playing, goodbye!"
 
 =begin
+allow users to enter full name of a move
 
 lines 38, 39, 80 are too long, reference review for ideas
 store scores in a hash so it's a single variable
