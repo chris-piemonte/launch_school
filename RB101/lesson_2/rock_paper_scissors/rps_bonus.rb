@@ -131,9 +131,4 @@ end
 
 prompt "Thanks for playing, goodbye!"
 
-=begin
-
-lines 38, 39, 80 are too long, reference review for ideas
-store scores in a hash so it's a single variable
-create more methods in main game loop to shorten it
-=end
+# store scores in a hash so it's a single variable
