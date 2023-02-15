@@ -109,7 +109,14 @@ Algorithm:
   - get the last row of the rows array
   - get last integer of that row
   - add 2 to the integer
-=end
+
+## Final Thoughts
+
+- Not a completely linear process
+- Move back and forward between the steps
+- Switch from implementation mode to abstract problem solving mode when necessary
+- DOn't try to problem solve at the code level
+  =end
 
 def sum_even_number_row(row_number)
   rows = []

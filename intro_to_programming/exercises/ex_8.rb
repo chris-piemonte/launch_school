@@ -1,3 +1,2 @@
-hash_old = { :key => "value" }
-
-hash_new = { key: "value" }
+hash_1 = { :old => "way" }
+hash_2 = { new: "way" }
