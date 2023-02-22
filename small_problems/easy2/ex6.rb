@@ -1,5 +1,9 @@
-# (1..99).to_a.each { |i| puts i if i.odd? }
+# (1..99).each { |x| puts x if x.odd? } 
 
-# puts (1..10).to_a.select { |i| i.odd? }
+# 1.upto(99) { |x| puts x if x.odd? }
 
-1.upto(99) { |i| puts i if i.odd? }
+number = 1
+until number > 99
+  puts number
+  number += 2
+end

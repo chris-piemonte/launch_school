@@ -1,16 +1,19 @@
-def stringy(num, start = 1)
-  array = []
-  
-  num.times { |index| index.even? ? array << start : array << 1 - start }
-  array = array.join
-end
+def stringy(num, default = 1)
+  arr = []
 
-puts stringy(6) == '101010'
-puts stringy(9) == '101010101'
-puts stringy(4) == '1010'
-puts stringy(7) == '1010101'
+  num.times do |ind|
+    if default == 1
+      number = ind.even? ? 1 : 0
+      arr << number
+    else
+      number = ind.odd? ? 1 : 0
+      arr << number
+    end
+  end
+  arr.join
+end
 
 p stringy(6,0)
 p stringy(9,0)
-p stringy(4,0)
-p stringy(7,0)
+p stringy(4)
+p stringy(7)

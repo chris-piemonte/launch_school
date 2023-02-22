@@ -1,11 +1,12 @@
-puts "Welcome to the  madlibs!"
-puts "Enter a noun:"
+puts "Let's do a madlibs! First enter a noun:"
 noun = gets.chomp
-puts "Enter a verb:"
+puts "Now enter a verb:"
 verb = gets.chomp
-puts "Enter an adjective:"
+puts "And an adjective:"
 adjective = gets.chomp
-puts "Enter an adverb:"
+puts "Finally enter an adverb:"
 adverb = gets.chomp
 
-puts "Your #{adjective} #{noun} likes to #{verb} #{adverb}? Gross!"
+puts "Press enter to generate your madlib!"
+gets.chomp
+puts "I heard you #{verb} the #{adjective} #{noun} #{adverb}!"

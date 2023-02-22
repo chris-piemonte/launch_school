@@ -1,9 +1,11 @@
-puts 'Want to know how long until you retire'
-puts 'Enter your age:'
+puts "I can tell you ho many years until you will retire! How old are you?"
 age = gets.chomp.to_i
-puts 'And what age would you like to retire?:'
-retire_age = gets.chomp.to_i
-years_to_work = retire_age - age
+puts "And what age would you like to retire?"
+retirement_age = gets.chomp.to_i
 
-puts "It is #{Time.now.year}. You will retire in #{Time.now.year + years_to_work}."
-puts "You have #{years_to_work} more years to work!"
+current_year = Time.now.year
+years_until_retirement = (retirement_age - age)
+retirement_year = current_year + years_until_retirement
+
+puts "It is #{current_year}, you will retire in #{retirement_year}."
+puts "You have #{years_until_retirement} years of work to go!"

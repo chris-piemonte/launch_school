@@ -1,9 +1,5 @@
-puts 'Choose a name.'
+puts "Give me a name and I can predict their age:"
 name = gets.chomp
-age = rand(20..200)
+name = "Teddy" if name == ''
 
-if name.empty?
-  puts "Teddy is #{age} years old!"
-else
-  puts "#{name} is #{age} years old!"
-end
+puts "#{name} is #{rand(20..200)} years old!"

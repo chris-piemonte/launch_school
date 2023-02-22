@@ -1,10 +1,17 @@
-SQMETERS_TO_FEET = 10.7639
+def feet_to_inches(feet)
+  (feet * 12).round(2)
+end
 
-puts 'What is the size of your room'
-puts 'length in meters:'
-length = gets.chomp.to_f
-puts 'width in meters:'
+def feet_to_cm(feet)
+  (feet * 30.48).round(2)
+end
+
+puts "I can measure the area of a room for you in both square feet, inches, and centimeters!"
+puts "Enter the width of the room in feet:"
 width = gets.chomp.to_f
+puts "Now enter the length of the room in feet:"
+length = gets.chomp.to_f
 
-puts "The area of your room is #{(length * width).round(2)} square meeters"
-puts "Or #{(length * width * SQMETERS_TO_FEET).round(2)} square feet"
+sq_feet = (width * length).round(2)
+
+puts "The area of the room is #{sq_feet} square feet or #{feet_to_inches(sq_feet)} square inches or #{feet_to_cm(sq_feet)} centimeters."

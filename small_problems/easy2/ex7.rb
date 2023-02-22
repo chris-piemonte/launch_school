@@ -1,1 +1,1 @@
-(1..99).to_a.each { |i| puts i if i.even? }
+(1..99).each { |x| puts x if x.even? }
