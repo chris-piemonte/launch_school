@@ -1,10 +1,10 @@
-def palindrome?(input)
-  input == input.reverse
+def palindrome?(arg)
+  arg == arg.reverse
 end
 
-def real_palindrome?(argument)
-  argument = argument.downcase.delete('^a-z0-9')
-  palindrome?(argument)
+def real_palindrome?(string)
+  new_string = string.downcase.delete('^a-z0-9')
+  palindrome?(new_string)
 end
 
 p real_palindrome?('madam') == true

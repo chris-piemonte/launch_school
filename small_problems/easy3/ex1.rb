@@ -1,30 +1,24 @@
 def prompt(string)
-  puts "==> #{string}"
+  puts "=> #{string}"
 end
 
+numbers = []
+
 prompt "Enter the 1st number:"
-first = gets.chomp.to_i
-
+numbers << gets.chomp
 prompt "Enter the 2nd number:"
-second = gets.chomp.to_i
-
+numbers << gets.chomp
 prompt "Enter the 3rd number:"
-third = gets.chomp.to_i
-
+numbers << gets.chomp
 prompt "Enter the 4th number:"
-fourth = gets.chomp.to_i
-
+numbers << gets.chomp
 prompt "Enter the 5th number:"
-fifth = gets.chomp.to_i
-
+numbers << gets.chomp
 prompt "Enter the last number:"
-last = gets.chomp.to_i
+num6 = gets.chomp
 
-arr = []
-arr.push(first, second, third, fourth, fifth)
-
-if arr.include?(last)
-  prompt "The number #{last} appears in #{arr}!"
+if numbers.include?(num6)
+  puts "The number #{num6} appears in #{numbers}!"
 else
-  prompt "The number #{last} does NOT appear in #{arr}."
+  puts "The number #{num6} does not appear in #{numbers}."
 end
