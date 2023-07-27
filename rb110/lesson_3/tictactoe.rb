@@ -11,24 +11,48 @@ def prompt(msg)
 end
 
 # rubocop:disable Metrics/AbcSize
-def display_board(brd)
+def display_board(board)
   system 'clear'
   puts "You're an #{PLAYER_MARKER}. Computer is #{COMPUTER_MARKER}."
   puts ""
   puts "     |     |"
-  puts "  #{brd[1]}  |  #{brd[2]}  |  #{brd[3]}"
+  puts "  #{board[1]}  |  #{board[2]}  |  #{board[3]}"
   puts "     |     |"
   puts "-----------------"
   puts "     |     |"
-  puts "  #{brd[4]}  |  #{brd[5]}  |  #{brd[6]}"
+  puts "  #{board[4]}  |  #{board[5]}  |  #{board[6]}"
   puts "     |     |"
   puts "-----------------"
   puts "     |     |"
-  puts "  #{brd[7]}  |  #{brd[8]}  |  #{brd[9]}"
+  puts "  #{board[7]}  |  #{board[8]}  |  #{board[9]}"
   puts "     |     |"
   puts ""
 end
 # rubocop:enable Metrics/AbcSize
+
+def display_scores(player_score, computer_score, current_player)
+  prompt "The player score is: #{player_score}, computer score: #{computer_score}"
+  prompt "First to 3 wins! #{current_player.capitalize} will start the next round."
+  prompt "Press any key to start the next round."
+  gets
+end
+
+def display_round_winner(board)
+  if someone_won?(board)
+    prompt "#{detect_winner(board).capitalize} won!"
+  else
+    prompt "It's a tie!"
+  end
+end
+
+def display_grand_winner(player_score, computer_score)
+  prompt "The player score is: #{player_score}, computer score: #{computer_score}"
+  if player_score == 3
+    prompt "You are the grand winner, congratulations!!!"
+  elsif computer_score == 3
+    prompt "The computer is the grand winner, better luck next time!"
+  end
+end
 
 def initialize_board
   new_board = {}
@@ -36,8 +60,8 @@ def initialize_board
   new_board
 end
 
-def empty_squares(brd)
-  brd.keys.select { |num| brd[num] == INITIAL_MARKER }
+def empty_squares(board)
+  board.keys.select { |num| board[num] == INITIAL_MARKER }
 end
 
 def joinor(array, delimiter = ', ', ending = 'or')
@@ -50,15 +74,15 @@ def joinor(array, delimiter = ', ', ending = 'or')
   end
 end
 
-def player_places_piece!(brd)
+def player_places_piece!(board)
   square = ''
   loop do
-    prompt "choose a square (#{joinor(empty_squares(brd))}):"
+    prompt "choose a square (#{joinor(empty_squares(board))}):"
     square = gets.chomp.to_i
-    break if empty_squares(brd).include?(square)
+    break if empty_squares(board).include?(square)
     prompt "Sorry, that is not a valid choice."
   end
-  brd[square] = PLAYER_MARKER
+  board[square] = PLAYER_MARKER
 end
 
 def find_at_risk_square(line, board, marker)
@@ -67,53 +91,53 @@ def find_at_risk_square(line, board, marker)
   end
 end
 
-def computer_square_choice(brd, marker)
+def computer_square_choice(board, marker)
   square = nil
   WINNING_LINES.each do |line|
-    square = find_at_risk_square(line, brd, marker)
+    square = find_at_risk_square(line, board, marker)
     break if square
   end
   square
 end
 
-def computer_places_piece!(brd)
-  square = computer_square_choice(brd, COMPUTER_MARKER)
+def computer_places_piece!(board)
+  square = computer_square_choice(board, COMPUTER_MARKER)
 
-  square = computer_square_choice(brd, PLAYER_MARKER) if !square
+  square = computer_square_choice(board, PLAYER_MARKER) if !square
 
-  square = 5 if !square && brd[5] == INITIAL_MARKER
-  square = empty_squares(brd).sample if !square
-  brd[square] = COMPUTER_MARKER
+  square = 5 if !square && board[5] == INITIAL_MARKER
+  square = empty_squares(board).sample if !square
+  board[square] = COMPUTER_MARKER
 end
 
-def board_full?(brd)
-  empty_squares(brd).empty?
+def board_full?(board)
+  empty_squares(board).empty?
 end
 
-def someone_won?(brd)
-  !!detect_winner(brd)
+def someone_won?(board)
+  !!detect_winner(board)
 end
 
-def detect_winner(brd)
+def detect_winner(board)
   WINNING_LINES.each do |line|
-    if brd.values_at(*line).count(PLAYER_MARKER) == 3
-      return 'Player'
-    elsif brd.values_at(line[0], line[1], line[2]).count(COMPUTER_MARKER) == 3
-      return 'Computer'
+    if board.values_at(*line).count(PLAYER_MARKER) == 3
+      return 'player'
+    elsif board.values_at(line[0], line[1], line[2]).count(COMPUTER_MARKER) == 3
+      return 'computer'
     end
   end
   nil
 end
 
 def computer_chooses_who_goes_first?
-  does_computer_choosse = ''
+  does_computer_choose = ''
   loop do
     prompt 'Do you want the computer to choose who goes first? (yes, no)'
-    does_computer_choosse = gets.chomp.downcase
+    does_computer_choose = gets.chomp.downcase[0]
 
-    case does_computer_choosse
-    when 'yes' then return true
-    when 'no' then return false
+    case does_computer_choose
+    when 'y' then return true
+    when 'n' then return false
     else prompt 'Sorry, that is not a valid response.'
     end
   end
@@ -123,97 +147,98 @@ def player_chooses_who_goes_first
   answer = ''
   loop do
     prompt 'Who do you want to make the first move? (player, computer)'
-    answer = gets.chomp
-    break if answer.downcase == 'player' || answer.downcase == 'computer'
+    answer = gets.chomp.downcase[0]
+    break if answer == 'p' || answer == 'c'
     prompt 'Sorry, that is not a valid response.'
   end
-  answer
+
+  if answer == 'p'
+    answer = 'player'
+  elsif answer == 'c'
+    answer = 'computer'
+  end
 end
 
-def place_piece!(brd, player)
+def place_piece!(board, player)
   if player == 'player'
-    player_places_piece!(brd)
-  elsif player == 'computer'
-    computer_places_piece!(brd)
+    player_places_piece!(board)
+  else
+    computer_places_piece!(board)
   end
 end
 
-def alternate_player!(player)
-  if player == 'player'
-    player = 'computer'
-  elsif player == 'computer'
-    player = 'player'
-  end
-  player
+def take_turn(board, player)
+  display_board(board)
+  place_piece!(board, player)
 end
 
-player_score = 0
-computer_score = 0
+def alternate_player(player)
+  player == 'player' ? 'computer' : 'player'
+end
 
-prompt 'Welcome to tictactoe! Mark three squares in a row to win the round.'
+def increment_score!(board, scores)
+  scores[:player_score] += 1 if detect_winner(board) == 'player'
+  scores[:computer_score] += 1 if detect_winner(board) == 'computer'
+end
 
-loop do
-  loop do
-    board = initialize_board
-    computer_chooses = computer_chooses_who_goes_first?
-
-    if computer_chooses == true
-      first_move = ['player', 'computer'].sample
-      prompt "Computer chooses #{first_move} to go first!"
-      prompt "Press any key to continue."
-      gets
-    elsif computer_chooses == false
-      first_move = player_chooses_who_goes_first
-    end
-
-    current_player = first_move
-    if first_move == 'player'
-      loop do
-        display_board(board)
-        place_piece!(board, current_player)
-        current_player = alternate_player!(current_player)
-        break if someone_won?(board) || board_full?(board)
-      end
-    elsif first_move == 'computer'
-      loop do
-        display_board(board)
-        place_piece!(board, current_player)
-        current_player = alternate_player!(current_player)
-        break if someone_won?(board) || board_full?(board)
-      end
-    end
-
-    display_board(board)
-
-    if someone_won?(board)
-      prompt "#{detect_winner(board)} won!"
-      player_score += 1 if detect_winner(board) == 'Player'
-      computer_score += 1 if detect_winner(board) == 'Computer'
-    else
-      prompt "It's a tie!"
-    end
-
-    break if player_score == 3 || computer_score == 3
-    prompt "The score is player: #{player_score}, computer: #{computer_score}"
-    prompt "First to 3 wins."
-    prompt "Press any key to start the next round."
-    gets
-  end
-
-  if player_score == 3
-    prompt "You are the grand winner, congratulations!!!"
-  elsif computer_score == 3
-    prompt "The computer is the grand winner, better luck next time!"
-  end
-
+def play_again?(hash)
   prompt "Play again? (y or n)"
   answer = gets.chomp
   if answer.downcase.start_with?('y')
-    player_score = 0
-    computer_score = 0
+    hash[:player_score] = 0
+    hash[:computer_score] = 0
+    true
   else
-    break
+    false
   end
+end
+
+def choose_starting_player
+  computer_chooses = computer_chooses_who_goes_first?
+  
+  if computer_chooses == true
+    starting_player = ['player', 'compuer'].sample
+    prompt "Computer chooses #{starting_player} to go first!"
+    prompt "Press any key to continue."
+    gets
+    starting_player
+  elsif computer_chooses == false
+    player_chooses_who_goes_first
+  end
+end
+
+system 'clear'
+scores = { player_score: 0, computer_score: 0 }
+
+prompt 'Welcome to tictactoe! Mark three squares in a row to win the round.'
+prompt 'It is you versus the computer, first to win three rounds wins the match!'
+
+loop do
+  round_starting_tracker = choose_starting_player
+  loop do
+    board = initialize_board
+    current_player = round_starting_tracker
+    loop do
+      take_turn(board, current_player)
+      current_player = alternate_player(current_player)
+      break if someone_won?(board) || board_full?(board)
+    end
+
+    display_board(board)
+    display_round_winner(board)
+    increment_score!(board, scores)
+
+    break if scores[:player_score] == 3 || scores[:computer_score] == 3
+
+    round_starting_tracker = alternate_player(round_starting_tracker)
+    display_scores(scores[:player_score], scores[:computer_score], round_starting_tracker)
+  end
+
+  display_grand_winner(scores[:player_score], scores[:computer_score])
+
+  new_game = play_again?(scores)
+  break if new_game == false
+  system 'clear'
 end
 
 prompt "Thanks for playing Tic Tac Toe! Good bye!"
