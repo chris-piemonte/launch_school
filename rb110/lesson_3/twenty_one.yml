@@ -1,0 +1,30 @@
+welcome: |
+  >> Welcome to Twenty-One!
+  >> There is one deck of playing cards used each round and the goal of the
+  >> game is to get as close to 21 as possible without going over.
+  >> Press any key to continue.
+card_explanation: |
+  >> You and the dealer both start with 2 cards, you can see both of yours
+  >> but only one of the dealer's. If you or the dealer starts with a
+  >> blackjack (a score of 21 from an Ace and a ten) they automatically win
+  >> the round. The card values are as follows:
+  >> - Cards 2 - 10 are worth their face value.
+  >> - Jack, queen, and king are all worth 10.
+  >> - Aces are worth 11 unless it would cause the player to go over 21
+       (a bust), then it is worth 1.
+  >> Press any key to continue.
+player_turn_rules: |
+  >> You will go first, you can 'hit' (take an additional card) as many times
+  >> as you want. To win, you must have a higher score than the dealer does
+  >> after their turn without busting (going over 21). When you stay, your
+  >> turn is over and your score is final.
+  >> Press any key to continue.
+dealer_turn_rules: |
+  >> On the dealers turn both of their cards are revealed. They must hit
+  >> until they have a 17 or higher. Like the player, if they bust they
+  >> lose. If it is a tie, that is called a 'push' and no one wins.
+  >> Press any key to start the game.
+
+dealer_hits_prompt: |
+  >> The dealer hits!
+  >> Press any key to continue.
