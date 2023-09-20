@@ -178,8 +178,8 @@ def check_for_blackjacks(player_cards, dealer_cards, totals)
   end
 end
 
-def display_a_or_an(cards)
-  if NUMBER_CONVERSION[cards[0][0]].start_with?(/[aeiou]/i)
+def format_a_or_an(current_player_cards)
+  if NUMBER_CONVERSION[current_player_cards[0][0]].start_with?(/[aeiou]/i)
     'an'
   else
     'a'
@@ -187,7 +187,9 @@ def display_a_or_an(cards)
 end
 
 def display_initial_cards(player_cards, dealer_cards)
-  prompt "The dealer's visible card is #{display_a_or_an(dealer_cards)} #{display_cards_text(dealer_cards[0].split)}."
+  a_or_an = format_a_or_an(dealer_cards)
+  card = display_cards_text(dealer_cards.first.split)
+  prompt "The dealer's visible card is #{a_or_an} #{card}."
   display_all_cards(dealer_cards[0].split)
   prompt "Your cards are: #{display_cards_text(player_cards)}"
   display_all_cards(player_cards)
@@ -200,7 +202,8 @@ def display_dealer_cards(dealer_cards, totals)
 end
 
 def hit_or_stay(totals)
-  prompt "Your total is #{totals[:player_total]}. Would you like to hit (h) or stay (s)?"
+  total = totals[:player_total]
+  prompt "Your total is #{total}. Would you like to hit (h) or stay (s)?"
   loop do
     choice = gets.chomp.downcase[0]
     case choice
@@ -218,10 +221,14 @@ end
 
 def display_new_card(current_player, current_player_cards)
   if current_player == 'player'
-    prompt "You drew #{display_a_or_an(current_player_cards.last)} #{display_cards_text(current_player_cards.last.split)}."
+    a_or_an = format_a_or_an(current_player_cards.last)
+    card = display_cards_text(current_player_cards.last.split)
+    prompt "You drew #{a_or_an} #{card}."
     prompt "Your cards are: #{display_cards_text(current_player_cards)}."
   elsif current_player == 'dealer'
-    prompt "The dealer drew #{display_a_or_an(current_player_cards.last)} #{display_cards_text(current_player_cards.last.split)}."
+    a_or_an = format_a_or_an(current_player_cards.last)
+    card = display_cards_text(current_player_cards.last.split)
+    prompt "The dealer drew #{a_or_an} #{card}."
     prompt "The dealer's cards are #{display_cards_text(current_player_cards)}."
   end
 end
@@ -247,7 +254,10 @@ def player_turn(player_cards, dealer_cards, deck, totals)
     break if player_choice == 'stay'
     hit!(player_cards, deck, totals, :player_total)
     display_card_drawing('player', player_cards, totals)
-    break if totals[:player_total] > MAX_TOTAL
+    if busted?('player', totals)
+      display_busted_text(totals)
+      break
+    end
   end
 end
 
@@ -259,6 +269,10 @@ def dealer_turn(dealer_cards, deck, totals)
     gets
     hit!(dealer_cards, deck, totals, :dealer_total)
     display_card_drawing('dealer', dealer_cards, totals)
+    if busted?('dealer', totals)
+      display_busted_text(totals)
+      break
+    end
   end
 end
 
@@ -293,9 +307,11 @@ def increment_scores!(winner, score)
 end
 
 def display_final_totals(totals)
+  player_total = totals[:player_total]
+  dealer_total = totals[:dealer_total]
   prompt "Time to compare compare totals, press any key to continue."
   gets
-  prompt "Your total is #{totals[:player_total]}, the dealer's total is #{totals[:dealer_total]}."
+  prompt "Your total is #{player_total}, the dealer's total is #{dealer_total}."
 end
 
 def display_winner(winner)
@@ -309,6 +325,12 @@ end
 def winner_already_delcared?(player_cards, dealer_cards, totals)
   busted?('player', totals) || busted?('dealer', totals) ||
     either_blackjack?(player_cards, dealer_cards, totals)
+end
+
+def display_game_score(score)
+  player_score = score[:player_score]
+  dealer_score = score[:dealer_score]
+  prompt "The score is player: #{player_score}, dealer: #{dealer_score}."
 end
 
 def play_again?
@@ -333,17 +355,13 @@ loop do
 
   deal_initial_cards(deck, player_cards, dealer_cards, totals)
 
-  1.times do
-    check_for_blackjacks(player_cards, dealer_cards, totals)
-    break if either_blackjack?(player_cards, dealer_cards, totals)
+  check_for_blackjacks(player_cards, dealer_cards, totals)
 
+  unless either_blackjack?(player_cards, dealer_cards, totals)
     player_turn(player_cards, dealer_cards, deck, totals)
-    display_busted_text(totals) if busted?('player', totals)
-    break if busted?('player', totals)
-
-    dealer_turn(dealer_cards, deck, totals)
-    display_busted_text(totals) if busted?('dealer', totals)
-    break if busted?('dealer', totals)
+    unless busted?('player', totals)
+      dealer_turn(dealer_cards, deck, totals)
+    end
   end
 
   winner = determine_winner(totals)
@@ -352,7 +370,7 @@ loop do
     display_final_totals(totals)
     display_winner(winner)
   end
-  prompt "The score is player: #{score[:player_score]}, dealer: #{score[:dealer_score]}."
+  display_game_score(score)
   break unless play_again?
 end
 
