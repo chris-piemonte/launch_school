@@ -1,39 +1,38 @@
 =begin
 
 input: integer
-output: integer, next featured number
-rules
+output: next higherst integer that is featured
+        - odd number, multiple of 7, digits only occur once
+rules:
   explicit:
-    - unique number is odd, multiple of 7, all unique digits
-    - return the next featured number
-    - return an error message if there is no next featured number
+  - featured number is off, multiple of 7, digits occurs once
+  - return an error message if no next featured number
   implicit:
-    - 0 is not a featured number
-    - argument does not have to bea a featured number itself
-algorithm:
-  - define a method `featured(num)`
-  - create a variable called `multiple` equal to (`num` / 7) + 1
-  - create a variable called `annswer` equal to 0
-  - loop do
-      - answer = `multiple` * 7
-      - break if answer is odd && answer's length == answer.to_s.chars.uniq.length
-      - multiple += 1
-      -end
-  - return answer
+    - can't have more than 10 digits
+    - all numbers are integers not floats
+
+DATA
+array to store and compare the digits
+
+ALGORITHM
+- define a method `featured(n)
+- start a loop from n + 1 to 9999999999
+  - if num is odd and a multiple of 7
+    - convert num to an array of string digits
+    - if all elements of the array are unique (array is equal to itself with non-unique values removed)
+      - return num
+  - return 'There is no possible number that fulfills those requirements' if return condition not met
 
 =end
 
-def featured(num)
-  return 'There is no number that fulfills the requirements' if num > 9_876_543_210
-  multiple = (num / 7) + 1
-  answer = 0
-
-  loop do
-    answer = multiple * 7
-    break if answer.odd? && answer.to_s.length == answer.to_s.chars.uniq.length
-    multiple += 1
+def featured(n)
+  (n+1).upto(9999999999) do |num|
+    if num.odd? && num % 7 == 0
+      array = num.to_s.chars
+      return num if array == array.uniq
+    end
   end
-  answer
+  'There is no possible number that fulfills those requirements.'
 end
 
 p featured(12) #== 21

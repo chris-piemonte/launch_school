@@ -1,40 +1,46 @@
 =begin
-input: 3 integers
-output: symbols (:acute, :right, :obtuse, :invalid)
-rules
+
+PROBLEM
+Write a method that takes the 3 angles of a triangle as arguments, and returns a symbol
+:right, :acute, :obtuse, or :invalid depending on whether the triangle is a right, acute, obtuse, or invalid triangle.
+
+input: 3 integer arguments
+output: symbol stating type of triangle, including invalid
+rules:
   explicit:
-    - right triancgle - one angle is 90 degrees
-    - acute riangle - all 3 angles less than 90 degrees
-    - obtuse triangle - one angle is greater than 90 degrees
-    - all angles must add up to 180 degrees and be greter than 0
-    - all arguments will be integer valued angles
-    - arguments are specified in degrees
-algorithm:
-  - define a method `triangle(one, two, three)`
-  - define a variable `angles` equal to the three arguments, sorted smallest to largest
-  - create a `case` statement
-    - when any angle is less than 1, or the sum of angles != 180
-      - :invalid
-    - when `angles` includes 90
-      - :right
-    - when `angles` all are less than 90
-      - :acute
-    - else
-      - :obtuse
+    - all angles add to 180
+    - right has an angle 90
+    - acute all 3 angles are less than 90
+    - obtuse one angle is greater than 90
+    - all arguments will be integers representing degrees
+  implicit:
+    - no angle can be less than 1
+    - all angles will be positive
+
+DATA
+case statement and possibly array for the angles
+
+ALGORITHM
+- define a method `triangle(a, b, c)`
+- make a case statement
+  - when a, b, and c don't add up to 180 or any of them are less tahn 1, return :invalid
+  - when a, b, or c is 90, return :right
+  - when a, b, and c are all less than 90, return :acute
+  - when any of a, b, and c are greater than 90, return :obtuse
 
 =end
 
-def triangle(one, two, three)
-  angles = [one, two, three]
+def triangle(a, b, c)
+  array = [a, b, c]
 
   case
-  when angles.any? { |angle| angle < 1 } || angles.reduce(:+) != 180
+  when array.sum != 180 || array.any? { |angle| angle < 1 }
     :invalid
-  when angles.include?(90)
+  when array.any? { |angle| angle == 90 }
     :right
-  when angles.all? { |angle| angle < 90 }
+  when array.all? { |angle| angle < 90 }
     :acute
-  else
+  when array.any? { |angle| angle > 90 }
     :obtuse
   end
 end

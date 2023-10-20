@@ -1,61 +1,41 @@
 =begin
 
+PROBLEM
+Write a method that takes a string as an argument, and returns true if all parentheses in the string are properly balanced,
+false otherwise. To be properly balanced, parentheses must occur in matching '(' and ')' pairs.
+
 input: string
 output: true/false
-rules;
+rules:
   explicit:
-    - test whether the parentheses in the argument string are balanced
-    - balanced pairs must start with `(` not `)`
+    - parentheses must have equal numbers of left and right
+    - paranthese must match
   implicit:
-    - it is balanced if there is no parentheses at all
-algorithm:
-  - define a method `balanced?(string)
-  - crete a hash called `parentheses` containing `(` and `)` as keys
-  - turn the argument string into an array of characters and iterate through it
-    - if the element is a `(` add 1 to its value in the hash
-    - if the element is a `)` add 1 to its value in the hash
-    - return `false` of the hash value of `)` > hash value of `(`
-  - return true
+    - if there are ever more right than left parentheses, false
+
+DATA
+array or hash
+
+ALRORITHM
+  - define a method `balanced?(string)`
+  - create a hash with 2 keys, left and right parentheses symbols
+  - convert the string into an array of characters
+  - iterate through the array
+    - if left or right parantheses, add to the value in the hash
+    - if right parentheses value > left parentheses value, return false
+  - if the values for both keys in hash equal, return true
 
 =end
 
-def balanced_paren?(string)
-  symbols = { '(' => 0, ')' => 0, '{' => 0, '}' => 0, '[' => 0, ']' => 0 }
-
-  string.chars.each do |ele|
-    symbols['('] += 1 if ele == '('
-    symbols[')'] += 1 if ele == ')'
-    symbols['{'] += 1 if ele == '{'
-    symbols['}'] += 1 if ele == '}'
-    symbols['['] += 1 if ele == '['
-    symbols[']'] += 1 if ele == ']'
-    return false if symbols['('] < symbols[')']
-    return false if symbols['{'] < symbols['}']
-    return false if symbols['['] < symbols[']']
-  end
-
-  return false if symbols['('] != symbols[')']
-  return false if symbols['{'] != symbols['}']
-  return false if symbols['['] != symbols[']']
-  true
-end
-
-def balanced_quotes?(string)
-  single_quotes = 0
-  double_quotes = 0
-
-  string.chars.each do |char|
-    single_quotes += 1 if char == "'"
-    double_quotes += 1 if char == '"'
-  end
-
-  return true if single_quotes.even? && double_quotes.even?
-  false
-end
-
 def balanced?(string)
-  return true if balanced_paren?(string) && balanced_quotes?(string)
-  false
+  hash = {left: 0, right: 0}
+  string.chars.each do |char|
+    hash[:left] += 1 if char == '('
+    hash[:right] += 1 if char == ')'
+    return false if hash[:right] > hash[:left]
+  end
+
+  hash[:left] == hash[:right]? true : false
 end
 
 p balanced?('What (is) this?') == true

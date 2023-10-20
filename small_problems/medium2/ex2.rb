@@ -1,53 +1,50 @@
 =begin
 
+PROBLEM:
 input: string
-outpus: true/false
+output: true or false
 rules:
-  explicit
-    - using a method, can the argument word be spelled with the 2 word pairs in the method
-    - letters are in pairs of 2
-    - you can only use 1 letter from each block
-    - each block can only be used once
-  implicit
-    - the word and blocks should not be case sensitive
-algorithm:
-  - define a method `block_word?`
-  - list all letter pairs as sub-arrays in an array called `blocks`
-  - create an empty variable called `argument_test` ***is this part necessary?
-  - create a variable called `argument_letters` that is an array of the individual leters of the argument string
-  - iterate through the `argument_letters` variable
-    - iterate through the `blocks` array
-      - if the `argument_letters` element is in the `blocks` element
-        - push the `argument_letters` element to `argument_test` ***is this part necessary?
-        - delete that `blocks` element pair permeneantly
-        - go to the next iteration
-      - else return `false`
+  explicit:
+    - true if the string can be spelled using set of blocks,
+    - each block can only use one letter
+    - each letter can be used only once
+  implicit:
+    - case does not matter
+    - each letter is only on one block, all letters present
+    - a string with more than one instance of a letter will be false
+    - maximum word length can be is 13
+
+DATA
+array of sub-arrays
+
+ALGORITHM
+- define a method `block_word?(string)`
+- create an array of sub arrays of all the block letter pairs, uppercase
+- turn the input string into an array of characters of the string, uppercase
+- iterate through the array of string characters
+  - if one of the block sub-arrays includes the string character of the iteration, delete that sub-array
+    - will have to iterate through the array of blocks
+- return true if array of string characters is the same length as 13 - array of blocks length
 
 =end
 
-# def block_word?(word)
-#   blocks = [['B', 'O'], ['X', 'K'], ['D', 'Q'], ['C', 'P'], ['N', 'A'],
-#             ['G', 'T'], ['R', 'E'], ['F', 'S'], ['J', 'W'], ['H', 'U'],
-#             ['V', 'I'], ['L', 'Y'], ['Z', 'M']]
-#   word_letters = word.chars
-#   word_test = ''
+# def block_word?(string)
+#   blocks = %w(BO XK DQ CP NA GT RE FS JW HU VI LY ZM)
 
-#   word_letters.each do |letter|
-#     blocks.each_with_index do |block, ind|
-#       if block.include?(letter.upcase)
-#         word_test << letter
-#         blocks.delete_at(ind)
-#         break
-#       end
+#   string = string.upcase.chars
+#   string.each do |char|
+#     blocks.each do |block|
+#       blocks.delete(block) if block.chars.include?(char)
 #     end
 #   end
-
-#   word_test == word
+#   return true if 13 - blocks.length == string.length
+#   false
 # end
 
 BLOCKS = %w(BO XK DQ CP NA GT RE FS JW HU VI LY ZM)
+
 def block_word?(string)
-  string = string.upcase
+  string.upcase!
   BLOCKS.none? { |block| string.count(block) >= 2 }
 end
 

@@ -1,66 +1,45 @@
 =begin
 
-input: year in integer form
-output: integer, number of Friday the 13ths in the year
+Write a method that returns the number of Friday the 13ths in the year given by an argument. You may assume that the year is greater than 1752.
+
+input: integer
+output: integer
 rules:
   explicit:
-    - output number of Friday the 13ths in argument yer
-    - argument year always greater than 1752
-algorithm:
-  - 
+    - input integer is year
+    - output i number of Friday the 13ths in the year
+    - the input is always greter than 1752
+
+DATA
+Date class
+
+ALGORITHM
+- requre the Date class
+- define a method `friday_13th(year)`
+- set a `date` variable asssigned to the first day of the input year
+- set a counter variable `number` to keep count of the number of Friday the 13ths
+- start a loop until the year in `date` is one greter than input year
+  - if the day is Friday and the 13th
+    - increment `number` by one
+  - reassign `date` to the next  day
+- return `number`
+
 =end
 
 require 'date'
 
 def friday_13th(year)
-  count = 0
-  thirteenth = Date.civil(year, 1, 13)
-  12.times do
-    count += 1 if thirteenth.friday?
-    thirteenth = thirteenth.next_month
+  date = Date.new(year)
+  fridays = 0
+
+  until date.year == year + 1
+    fridays += 1 if date.friday? && date.day == 13
+    date = date.next_day
   end
-  count
+
+  fridays
 end
 
-require 'pry'
-
-def months_with_five_fridays(year)
-  five_friday_count = 0
-  day = Date.civil(year, 1, 1)
-  month = 1
-
-  12.times do
-    count = 0
-    until day.month == month + 1
-      count += 1 if day.friday?
-      day = day.next_day
-      break if day.year == year + 1
-    end
-    five_friday_count += 1 if count == 5
-    month += 1
-  end
-  five_friday_count
-end
-
-def five_fridays(year)
-  count = 0
-  1.upto(12) do |month|
-    fridays = 0
-    day = Date.new(year, month, 1)
-    day.upto(day.next_month.prev_day) { |date| fridays += 1 if date.wday == 5 }
-    count += 1 if fridays == 5
-  end
-  count
-end
-
-# p friday_13th(2015) == 3
-# p friday_13th(1986) == 1
-# p friday_13th(2019) == 2
-
-p months_with_five_fridays(2023)
-p months_with_five_fridays(2024)
-p months_with_five_fridays(2027)
-
-p five_fridays(2023)
-p five_fridays(2024)
-p five_fridays(2027)
+p friday_13th(2015) == 3
+p friday_13th(1986) == 1
+p friday_13th(2019) == 2

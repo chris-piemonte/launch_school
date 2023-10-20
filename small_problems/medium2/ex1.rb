@@ -1,74 +1,29 @@
 =begin
 
-input: string
-outpus: printed longest string w/ number of words printed
+PROBLEM
+input: text file
+output: integer representing the number of words in the longest sentence in the text file
 rules:
   explicit:
-    - print longest sentence based on number of words
-    - sentences end with (.), (!), (?)
-    - any sequence of characters not spaces or sentence ending characters are words
-    - print number of words in longest sentence
-algorithm:
-  - convert the text into an array of sentences using `sentences = text.split(/\.|\?|!/)`
-  - create a variable `longest_sentence` to store the longest sentence
-  - iterate through the array using `each`
-    - split the element using `String.split`
-    - push
-  - print `longest_sentence`
-  - print `number_of_words`
+    - input is an outside text file
+    - output is integer of number of wors in longest sentence,
+    - sentences ony end with . ! ?
+    - '--' counts as a word
 
+ALGORITHM
+- pull a text file into the program and assign to a variable
+- split the text file into an array of sentences using `text.split(/\.|\?|!/)`
+- call transformative iteration on this array, turinging each element into an array of words seperated by whitespace
+- initialize a variable `count` = 0
+- iterate over the array, count the number of elements in the sub-array and reassign `count` to this value if it's greater than `count`
+- return `count`
 =end
 
-# def longest_sentence(text)
-#   longest_sentence = ''
+string = File.open('ex1_text.txt').read
+array = string.split(/\.|\?|!/).map! { |sentence| sentence.split }
 
-#   text.split(/\.|\?|!/).each do |sentence|
-#     if sentence.split.count > longest_sentence.split.count
-#       longest_sentence = sentence 
-#     end
-#   end
+longest = []
+array.each { |sentence| longest = sentence if sentence.count > longest.count }
 
-#   puts longest_sentence
-#   puts "The longest sentence contains #{longest_sentence.split.count} words."
-# end
-
-def longest_sentence(text)
-  sentences = text.split(/\.|\?|!/)
-  longest_sentence = sentences.max_by { |sentence| sentence.split.size }.strip
-
-  sentence_index = text.index(longest_sentence)
-  sentence_length = longest_sentence.size
-  longest_sentence << text[(sentence_index + sentence_length)]
-
-  puts longest_sentence
-  puts "The longest sentence contains #{longest_sentence.split.size} words."
-end
-
-def longest_word(text)
-  words = text.split(/\W/)
-  longest_word = words.max_by { |word| word.size }
-  longest_word_length = longest_word.size
-
-  puts "The longest word is #{longest_word} and it is #{longest_word_length} letters long."
-end
-
-def longest_paragraph(text)
-  paragraphs = text.split(/\n\n/)
-  longest_paragraph = paragraphs.max_by { |paragraph| paragraph.split.size }
-  longest_paragraph_length = longest_paragraph.split.size
-
-  puts longest_paragraph
-  puts "The longest paragraph is #{longest_paragraph_length} words long."
-end
-
-def longest(text, unit)
-  case unit
-  when 'word' then longest_word(text)
-  when 'sentence' then longest_sentence(text)
-  when 'paragraph' then longest_paragraph(text)
-  end
-end
-
-text = File.read('ex1_text.txt')
-
-longest(text, 'paragraph')
+p longest.join(' ')
+p longest.count

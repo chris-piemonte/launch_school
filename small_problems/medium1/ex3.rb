@@ -1,27 +1,32 @@
 =begin
 
+If you take a number like 735291, and rotate it to the left, you get 352917. If you now keep the first digit fixed in place,
+and rotate the remaining digits, you get 329175. Keep the first 2 digits fixed in place and rotate again to 321759. Keep the 
+first 3 digits fixed in place and rotate again to get 321597. Finally, keep the first 4 digits fixed in place and rotate the 
+final 2 digits to get 321579. The resulting number is called the maximum rotation of the original number.
+
+Write a method that takes an integer as argument, and returns the maximum rotation of that argument. 
+You can (and probably should) use the rotate_rightmost_digits method from the previous exercise.
+
+Note that you do not have to handle multiple 0s.
+
 input: integer
-output: integer, maximum rotated
+output: integer, max rotated
 rules:
   explicit:
-    - maximum rotate the input integer
-    - use the methods from the previous 2 examples
+    - rotate the integer to the left
+    - keep the first integer in place, then rorate the remaining digits
+    - keep the first 2 integers in place, rotate the remaing digits, etc....
+    - do not have to handle multiple 0s
+  implicit:
+    - single digit integers will return themselves
 algorithm:
-  - create an additional method `rotate_leftmost_digits(num, digits)`
-    - create a variable `num_array` equal to `num` as an array of the digits as strings
-    - mutate `num_array` so the left digits from element 0 to digits - 1 are rotated using the `rotate_array` method
-    - join `num_array` into a string, and convert it into an integer
-
   - define a method `max_rotation(num)`
-  - set a variable `rotations_left` equal to the length of `num` - 1
-  - set a variable `start_index` equal to 0
-  - create an array `num_array` equal to `num` converted to an array of strings
-  - start a loop
-    - set `num_array` elements `start_index` to end of array equal to `rotate_array` methos called ou `num_array` elements `start_index` to end of array
-    - increment `start_index` by 1
-    - reduce `rotattions_left` by 1
-    - break if `rotation_left` == 0
-  - join num_array into a string and convert it into an integer
+  - initialize a variable assigned to the length of num converted to a string
+  - create a loop length of array times
+    - reassign the array to the method call `rotate_rightmost_digits` with the array and array length variables as teh 2 arguments
+    - reassign the length variable to itself - 1
+  - return the array joined together and converted to an integer
 
 =end
 
@@ -29,31 +34,27 @@ def rotate_array(array)
   array[1..-1] + [array[0]]
 end
 
-def rotate_rightmost_digits(num, digits)
-  num_array = num.to_s.chars
-  num_array[-digits..-1] = rotate_array(num_array[-digits..-1])
-  num_array.join
+def rotate_rightmost_digits(num, n)
+  digits = num.to_s.chars
+  digits[-n..-1] = rotate_array(digits[-n..-1])
+  digits.join.to_i
 end
 
 # def max_rotation(num)
-#   rotations_left = num.to_s.size - 1
-#   start_index = 0
-#   num_array = num.to_s.chars
-
-#   loop do
-#     num_array[start_index..-1] = rotate_array(num_array[start_index..-1])
-#     start_index += 1
-#     rotations_left -= 1
-#     break if rotations_left <= 0
+#   length = num.to_s.length
+#   length.times do
+#     num = rotate_rightmost_digits(num, length)
+#     length -= 1
 #   end
-
-#   num_array.join.to_i
+#   num
 # end
 
 def max_rotation(num)
-  number_digits = num.to_s.size
-  number_digits.downto(2) { |n| num = rotate_rightmost_digits(num, n) }
-  num.to_i
+  length = num.to_s.length
+  length.downto(1) do |n|
+    num = rotate_rightmost_digits(num, n)
+  end
+  num
 end
 
 p max_rotation(735291) == 321579
@@ -61,5 +62,3 @@ p max_rotation(3) == 3
 p max_rotation(35) == 53
 p max_rotation(105) == 15 # the leading zero gets dropped
 p max_rotation(8_703_529_146) == 7_321_609_845
-p max_rotation(1000456)
-p max_rotation(123000456)

@@ -1,51 +1,40 @@
 =begin
 
+Write a method that rotates an array by moving the first element to the end of the array. The original array should not be modified.
+Do not use the method Array#rotate or Array#rotate! for your implementation.
+
 input: array
-output: array
+output: different array, first element moves to end of array
 rules:
   explicit:
-    - first elemtt moved to end of the array
-    - original array should not be modified
+    - input array must not be mutated
+    - first element becomes last element
+  implicit:
+    - array of one element will return itself
 algorithm:
-  - define an array `rotate_array(aray)`
-  - create a variable `first_element` equal to the first element of `array`
-  - iterate through `array` with index using `map`
-    - each element = index + 1
-    - if the index + 1 == the size of `array`, the element = `first_element`
+  - define a method `rotate_array`
+  - initialize a new empty array to be the return value of the method
+  - iterate through input array, pushing each element to the new array
+  - delete the first element of the new array, add element object to end of the array
+  -return the new array
 
 =end
 
 # def rotate_array(array)
-#   first_element = array[0]
-
-#   array.each_with_index.map do |ele, ind|
-#     if array.size > ind + 1
-#       ele = array[ind + 1]
-#     elsif ind + 1 == array.size
-#       ele = first_element
-#     end
-#   end
+#   new_array = []
+#   array.each { |ele| new_array << ele }
+#   new_array[new_array.length - 1] = new_array.delete_at(0)
+#   new_array
 # end
 
 def rotate_array(array)
   array[1..-1] + [array[0]]
 end
 
-def rotate_string(string)
-  rotate_array(string.chars).join
-end
+p rotate_array([7, 3, 5, 2, 9, 1]) == [3, 5, 2, 9, 1, 7]
+p rotate_array(['a', 'b', 'c']) == ['b', 'c', 'a']
+p rotate_array(['a']) == ['a']
 
-def rotate_integer(num)
-  rotate_array(num.to_s.chars).join.to_i
-end
-
-p rotate_string('abcde')
-p rotate_integer(12345)
-
-# p rotate_array([7, 3, 5, 2, 9, 1]) == [3, 5, 2, 9, 1, 7]
-# p rotate_array(['a', 'b', 'c']) == ['b', 'c', 'a']
-# p rotate_array(['a']) == ['a']
-
-# x = [1, 2, 3, 4]
-# p rotate_array(x) == [2, 3, 4, 1]   # => true
-# p x == [1, 2, 3, 4]                 # => true
+x = [1, 2, 3, 4]
+p rotate_array(x) == [2, 3, 4, 1]   # => true
+p x == [1, 2, 3, 4]                 # => true

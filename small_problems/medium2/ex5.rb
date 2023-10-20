@@ -1,31 +1,35 @@
 =begin
 
-input: 3 integers
-output: symbol
+equilateral All 3 sides are of equal length
+isosceles 2 sides are of equal length, while the 3rd is different
+scalene All 3 sides are of different length
+
+PROBLEM
+input: 3 integers, representing 3 sides of triangle
+output: type of triangle
 rules:
   explicit:
-    - to be a triangle, the lengths of the 2 shortest sides must be greater than the length of the longest side
-    - to be valid, all sides must hafve lengths greater than 0
-    - if either of the above conditions is not satisfied, return `:invalid`
-    - `:equilateral` - all 3 sides are equal length
-    - `:isosceles` - 2 sides are equal lengthm 3rd is different
-    - `:scalene` - all 3 sides are different length
-  implicit:
-    - floats are allowed
-algorithm:
-  - define a method `triangle(side_one, side_two, side_three)`
-  - return `:invalid` if the sum of all the sides minus the longest side < longest side
-  - return `:equilateral` if all three sides are equal
-  - return `:scaline` if all three sides are different
-  - else return `isosceles`
+    - equilateral All 3 sides are of equal length
+    - isosceles 2 sides are of equal length, while the 3rd is different
+    - scalene All 3 sides are of different length
+    - if the 2 shorter sides summed are less than the longest side, return invalid
+
+ALGORITHM
+  - define a method `triangle(a, b, c)`
+  - create an array using a b & c as the elements and sort it lowest to highest
+  - if a + b < c, return :invalid
+  - if a == b == c return :equilaretal
+  - if a == b != c or a == c != b or a == c != b return :isolsceles
+  - if a != b != c return :scaline
+
 =end
 
-def triangle(side_one, side_two, side_three)
-  sides = [side_one, side_two, side_three].sort
-  return :invalid if sides[0] + sides[1] <= sides[2]
-  return :equilateral if sides[0] == sides[1] && sides[1] == sides[2]
-  return :scalene if sides[0] != sides[1] && sides[1] != sides[2] && sides[2] != sides[1]
-  :isosceles
+def triangle(a, b, c)
+  array = [a, b, c].sort
+  return :invalid if array[0] + array[1] <= array[2]
+  return :equilateral if a == b && b == c
+  return :isosceles if a == b || a == c || b == c
+  :scalene
 end
 
 p triangle(3, 3, 3) == :equilateral
