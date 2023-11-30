@@ -40,7 +40,7 @@ module DisplayMessages
     human.move_history.size.times do |ele|
       human_choice = "#{human.name} chose #{human.move_history[ele]}"
       comp_choice = "computer chose #{computer.move_history[ele]}"
-      winner = "#{winner_history[ele]} won"
+      winner = "#{winner_history[ele]}"
       puts "On round #{round} #{human_choice}, #{comp_choice}. #{winner}!"
       round += 1
     end
