@@ -1,5 +1,3 @@
-require 'pry'
-
 module DisplayMessages
   def display_welcome_message
     puts "Welcome to Rock, Paper, Scissors!"
@@ -35,6 +33,28 @@ module DisplayMessages
     elsif computer.score == RPSGame::WINNING_SCORE
       puts "#{computer.name} wins! Better luck next time."
     end
+  end
+
+  def display_last_round_moves
+    round = 1
+    human.move_history.size.times do |ele|
+      human_choice = "#{human.name} chose #{human.move_history[ele]}"
+      comp_choice = "computer chose #{computer.move_history[ele]}"
+      winner = "#{winner_history[ele]} won"
+      puts "On round #{round} #{human_choice}, #{comp_choice}. #{winner}!"
+      round += 1
+    end
+  end
+
+  def display_move_history?
+    answer = nil
+    loop do
+      puts "Would you like to see the rounds of the last game? (y/n)"
+      answer = gets.chomp
+      break if ['y', 'n'].include? answer.downcase
+      puts "Sorry, must be y or n."
+    end
+    display_last_round_moves if answer == 'y'
   end
 end
 
@@ -276,28 +296,6 @@ class RPSGame
     computer.score = 0
     human.move_history = []
     computer.move_history = []
-  end
-
-  def display_last_round_moves
-    round = 1
-    human.move_history.size.times do |ele|
-      human_choice = "#{human.name} chose #{human.move_history[ele]}"
-      comp_choice = "computer chose #{computer.move_history[ele]}"
-      winner = "#{winner_history[ele]} won"
-      puts "On round #{round} #{human_choice}, #{comp_choice}. #{winner}!"
-      round += 1
-    end
-  end
-
-  def display_move_history?
-    answer = nil
-    loop do
-      puts "Would you like to see the rounds of the last game? (y/n)"
-      answer = gets.chomp
-      break if ['y', 'n'].include? answer.downcase
-      puts "Sorry, must be y or n."
-    end
-    display_last_round_moves if answer == 'y'
   end
 
   def game_loop
