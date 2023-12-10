@@ -135,7 +135,8 @@ class Human < Player
   def prompt_choice
     choice = nil
     loop do
-      puts "Please choose rock (r), paper (p), scissors (sc), spock (sp), or lizard (l):"
+      options = "rock (r), paper (p), scissors (sc), spock (sp), or lizard (l)"
+      puts "Please choose #{options}:"
       choice = gets.chomp.downcase
       break if Move::VALUES.include?(choice)
       puts "Sorry, invalid choice."
@@ -172,8 +173,6 @@ class R2D2 < Computer
     @name = 'R2D2'
   end
 
-  private
-
   MOVE_CHANCES = {
     'rock' => 2,
     'paper' => 2,
@@ -187,8 +186,6 @@ class Hal < Computer
   def set_name
     @name = 'Hal'
   end
-
-  private
 
   MOVE_CHANCES = {
     'rock' => 3,
@@ -204,8 +201,6 @@ class Chappie < Computer
     @name = 'Chappie'
   end
 
-  private
-
   MOVE_CHANCES = {
     'rock' => 4,
     'paper' => 3,
@@ -220,8 +215,6 @@ class Sonny < Computer
     @name = 'Sonny'
   end
 
-  private
-
   MOVE_CHANCES = {
     'rock' => 6,
     'paper' => 1,
@@ -235,8 +228,6 @@ class Number5 < Computer
   def set_name
     @name = 'Number 5'
   end
-
-  private
 
   MOVE_CHANCES = {
     'rock' => 10,
