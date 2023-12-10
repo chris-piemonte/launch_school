@@ -1,6 +1,7 @@
 module DisplayMessages
   def display_welcome_message
-    puts "Welcome to Rock, Paper, Scissors!"
+    system 'clear'
+    puts "Welcome to Rock, Paper, Scissors, Spock, Lizard!"
     puts "First to 3 wins is the victor!"
   end
 
@@ -40,7 +41,7 @@ module DisplayMessages
     human.move_history.size.times do |ele|
       human_choice = "#{human.name} chose #{human.move_history[ele]}"
       comp_choice = "computer chose #{computer.move_history[ele]}"
-      winner = "#{winner_history[ele]}"
+      winner = winner_history[ele].to_s
       puts "On round #{round} #{human_choice}, #{comp_choice}. #{winner}!"
       round += 1
     end
@@ -59,7 +60,7 @@ module DisplayMessages
 end
 
 class Move
-  VALUES = ['rock', 'paper', 'scissors', 'spock', 'lizard']
+  VALUES = %w(r rock p paper sc scissors sp spock l lizard)
   attr_reader :value
   attr_writer :move
 
@@ -98,7 +99,8 @@ class Lizard < Move
 end
 
 class Player
-  attr_accessor :move, :name, :score, :move_history
+  attr_accessor :move, :score, :move_history
+  attr_reader :name
 
   def initialize
     set_name
@@ -113,30 +115,32 @@ class Human < Player
     loop do
       puts "What's your name?"
       n = gets.chomp
-      break unless n.empty?
+      break unless n.strip.empty?
       puts "Sorry, must enter a value."
     end
-    self.name = n
-  end
-
-  def prompt_choice
-    choice = nil
-    loop do
-      puts "Please choose rock, paper, scissors, spock, or lizard:"
-      choice = gets.chomp
-      break if Move::VALUES.include? choice
-      puts "Sorry, invalid choice."
-    end
-    choice
+    @name = n
   end
 
   def choose
     choice = prompt_choice
-    self.move = Rock.new(choice) if choice == 'rock'
-    self.move = Paper.new(choice) if choice == 'paper'
-    self.move = Scissors.new(choice) if choice == 'scissors'
-    self.move = Spock.new(choice) if choice == 'spock'
-    self.move = Lizard.new(choice) if choice == 'lizard'
+    self.move = Rock.new('rock') if ['r', 'rock'].any?(choice)
+    self.move = Paper.new('paper') if ['p', 'paper'].any?(choice)
+    self.move = Scissors.new('scissors') if ['sc', 'scissors'].any?(choice)
+    self.move = Spock.new('Spock') if ['sp', 'spock'].any?(choice)
+    self.move = Lizard.new('lizard') if ['l', 'lizard'].any?(choice)
+  end
+
+  private
+
+  def prompt_choice
+    choice = nil
+    loop do
+      puts "Please choose rock (r), paper (p), scissors (sc), spock (sp), or lizard (l):"
+      choice = gets.chomp.downcase
+      break if Move::VALUES.include?(choice)
+      puts "Sorry, invalid choice."
+    end
+    choice
   end
 end
 
@@ -165,8 +169,10 @@ end
 
 class R2D2 < Computer
   def set_name
-    self.name = 'R2D2'
+    @name = 'R2D2'
   end
+
+  private
 
   MOVE_CHANCES = {
     'rock' => 2,
@@ -179,8 +185,10 @@ end
 
 class Hal < Computer
   def set_name
-    self.name = 'Hal'
+    @name = 'Hal'
   end
+
+  private
 
   MOVE_CHANCES = {
     'rock' => 3,
@@ -193,8 +201,10 @@ end
 
 class Chappie < Computer
   def set_name
-    self.name = 'Chappie'
+    @name = 'Chappie'
   end
+
+  private
 
   MOVE_CHANCES = {
     'rock' => 4,
@@ -207,8 +217,10 @@ end
 
 class Sonny < Computer
   def set_name
-    self.name = 'Sonny'
+    @name = 'Sonny'
   end
+
+  private
 
   MOVE_CHANCES = {
     'rock' => 6,
@@ -221,8 +233,10 @@ end
 
 class Number5 < Computer
   def set_name
-    self.name = 'Number 5'
+    @name = 'Number 5'
   end
+
+  private
 
   MOVE_CHANCES = {
     'rock' => 10,
@@ -239,10 +253,24 @@ class RPSGame
   attr_accessor :human, :computer, :winner_history
 
   def initialize
+    display_welcome_message
     @human = Human.new
     @computer = [R2D2.new, Hal.new, Chappie.new, Sonny.new, Number5.new].sample
     @winner_history = []
   end
+
+  def play
+    loop do
+      game_loop
+      display_game_winner
+      display_move_history?
+      break unless play_again?
+      reset_score_and_move_history
+    end
+    display_goodbye_message
+  end
+
+  private
 
   def increment_score
     if human.move > computer.move
@@ -252,16 +280,16 @@ class RPSGame
     end
   end
 
-  # Why does this give "C: [Correctable] Style/ConditionalAssignment: Use the
-  # return of the conditional for variable assignment and comparison."
   def record_winner
-    if human.move > computer.move
-      winner_history << 'Human won'
-    elsif computer.move > human.move
-      winner_history << 'Computer won'
-    else
-      winner_history << "It was a tie"
-    end
+    winner = if human.move > computer.move
+               'Human won'
+             elsif computer.move > human.move
+               'Computer won'
+             else
+               'It was a tie'
+             end
+
+    winner_history << winner
   end
 
   def record_moves
@@ -292,6 +320,7 @@ class RPSGame
   end
 
   def reset_score_and_move_history
+    system 'clear'
     human.score = 0
     computer.score = 0
     human.move_history = []
@@ -309,18 +338,6 @@ class RPSGame
       display_score
       break if winner?
     end
-  end
-
-  def play
-    display_welcome_message
-    loop do
-      game_loop
-      display_game_winner
-      display_move_history?
-      break unless play_again?
-      reset_score_and_move_history
-    end
-    display_goodbye_message
   end
 end
 
