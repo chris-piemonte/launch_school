@@ -1,6 +1,6 @@
 module Actions
   def walk
-    puts "#{@name} #{gait} forward"
+    puts "#{self} #{gait} forward"
   end
 end
 
@@ -10,6 +10,10 @@ class Person
 
   def initialize(name)
     @name = name
+  end
+
+  def to_s
+    name
   end
 
   private
@@ -27,6 +31,10 @@ class Cat
     @name = name
   end
 
+  def to_s
+    name
+  end
+
   private
 
   def gait
@@ -40,6 +48,10 @@ class Cheetah
 
   def initialize(name)
     @name = name
+  end
+
+  def to_s
+    name
   end
 
   private
@@ -58,12 +70,14 @@ class Noble
     @title = title
   end
 
-  def gait
-    "struts"
+  def to_s
+    "#{title} #{name}"
   end
 
-  def walk
-    puts "#{title} #{name} #{gait} forward"
+  private
+
+  def gait
+    "struts"
   end
 end
 
@@ -78,6 +92,3 @@ flash.walk
 
 byron = Noble.new("Byron", "Lord")
 byron.walk
-
-puts byron.name
-puts byron.title

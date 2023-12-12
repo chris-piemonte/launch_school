@@ -1,13 +1,55 @@
-class Pet
-  attr_reader :animal, :name
+class Shelter
+  attr_reader :owners
 
-  def initialize(animal, name)
-    @animal = animal
-    @name = name
+  def initialize
+    @owners = []
   end
 
-  def to_s
-    "a #{animal} named #{name}"
+  def adopt(owner, pet)
+    owner.pets << pet
+    @owners << owner
+    @owners.uniq!
+    pet.adopted = true
+  end
+
+  def print_unadopted
+    puts "The animal Shelter has the following unadopted pets:"
+    Pet.all_pets.each do |pet|
+      puts "a #{pet.species} names #{pet.name}" if pet.adopted == false
+    end
+  end
+
+  def print_adopted
+    @owners.each do |owner|
+      puts "#{owner.name} has adopted the following pets:"
+      owner.pets.each do |pet|
+        puts "a #{pet.species} named #{pet.name}"
+      end
+      puts
+    end
+  end
+
+  def print_adoptions
+    print_unadopted
+    puts
+    print_adopted
+  end
+end
+
+class Pet
+  @@all_pets = []
+  attr_accessor :adopted
+  attr_reader :species, :name
+
+  def initialize(species, name)
+    @species = species
+    @name = name
+    @adopted = false
+    @@all_pets << self
+  end
+
+  def self.all_pets
+    @@all_pets
   end
 end
 
@@ -19,35 +61,8 @@ class Owner
     @pets = []
   end
 
-  def add_pet(pet)
-    @pets << pet
-  end
-
   def number_of_pets
     pets.size
-  end
-
-  def print_pets
-    puts pets
-  end
-end
-
-class Shelter
-  def initialize
-    @owners = {}
-  end
-
-  def adopt(owner, pet)
-    owner.add_pet(pet)
-    @owners[owner.name] ||= owner
-  end
-
-  def print_adoptions
-    @owners.each_pair do |name, owner|
-      puts "#{name} has adopted the following pets:"
-      owner.print_pets
-      puts
-    end
   end
 end
 
@@ -58,6 +73,13 @@ kennedy      = Pet.new('dog', 'Kennedy')
 sweetie      = Pet.new('parakeet', 'Sweetie Pie')
 molly        = Pet.new('dog', 'Molly')
 chester      = Pet.new('fish', 'Chester')
+asta = Pet.new('dog', 'Asta')
+Laddie = Pet.new('dog', 'Laddie')
+fluffy = Pet.new('cat', 'Fluffy')
+kat = Pet.new('cat', 'Kat')
+ben = Pet.new('cat', 'Ben')
+chatterbox = Pet.new('parakeet', 'Chatterbox')
+bluebell = Pet.new('parakeet', 'Bluebell')
 
 phanson = Owner.new('P Hanson')
 bholmes = Owner.new('B Holmes')
