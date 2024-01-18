@@ -1,0 +1,28 @@
+rules_intro: |
+  There is one deck of playing cards used each round and the goal of the game
+  is to get as close to 21 as possible without going over. You and the dealer
+  both start with 2 cards, you can see both of yours but only one of the
+  dealer's cards.
+
+  Press enter to continue.
+card_values: |
+  The card values are as follows:
+  - Cards 2 - 10 are worth their face value.
+  - Jack, queen, and king are all worth 10.
+  - Aces are worth 11 unless it would cause the player to go over 21 (a bust),
+    then they are worth 1.
+
+  Press enter to continue.
+player_turn: |
+  You will go first, you can 'hit' (take an additional card) as many times as
+  you want. To win, you must have a higher score than the dealer does after
+  their turn without busting (going over 21). When you stay, your turn is over
+  and your score is final.
+
+  Press enter to continue.
+dealer_turn: |
+  On the dealers turn both of their cards are revealed. They must hit until
+  they have a 17 or higher. Like the player, if they bust they lose. If it is a
+  tie, that is called a 'push' and no one wins.
+
+  Press enter to start the game.
