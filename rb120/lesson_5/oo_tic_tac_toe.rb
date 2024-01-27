@@ -1,7 +1,110 @@
+module Display
+  # rubocop:disable Metrics/LineLength
+  def display_welcome_message
+    puts "Welcome to Tic Tac Toe!"
+    puts "First player to win #{TTTGame::WINNING_ROUNDS} rounds first is champion!"
+    puts "(you can also end the game after any round)"
+  end
+  # rubocop:enable Metrics/LineLength
+
+  def display_marker_prompt
+    puts "What would you like your marker to be?"
+    puts "Choose any single character other than 'O':"
+  end
+
+  def display_marker_errors(answer)
+    if answer.size != 1
+      puts "Sorry, marker must be one character."
+    elsif ['o', 'O'].include?(answer)
+      puts "Sorry, #{computer.name} already claimed 'O' as their marker!"
+    end
+  end
+
+  def display_reset_game_message
+    puts "Let's play again!"
+    puts ''
+  end
+
+  def display_player_names
+    puts "Lovely to meet you #{human.name}!"
+    puts "Your opponent is #{computer.name}"
+    puts "press enter to continue."
+    gets
+    clear_screen_and_display_board
+  end
+
+  def display_player
+    case @round_starter
+    when human.marker then human.name
+    when TTTGame::COMPUTER_MARKER then computer.name
+    end
+  end
+
+  # rubocop:disable Metrics/LineLength
+  def display_goodbye_message
+    win_text = "won #{TTTGame::WINNING_ROUNDS} rounds first! They are the champion!"
+    if winning_rounds_reached?
+      puts "#{human.name} #{win_text}" if score[:human] == TTTGame::WINNING_ROUNDS
+      puts "#{computer.name} #{win_text}" if score[:computer] == TTTGame::WINNING_ROUNDS
+    end
+    puts "Thanks for playing Tic Tac Toe! Goodbye!"
+  end
+  # rubocop:enable Metrics/LineLength
+
+  def display_board # how does this work in the display class?
+    if !human.marker.nil?
+      puts "You're #{human.marker}. #{computer.name} is #{computer.marker}."
+    end
+    board.draw_board
+  end
+
+  def clear_screen_and_display_board
+    clear_screen
+    display_board
+  end
+
+  def clear_screen
+    system 'clear'
+  end
+
+  def display_square_choices(board)
+    unmarked_keys = board.unmarked_keys
+    case board.unmarked_keys.size
+    when 1 then puts "Choose a square (#{unmarked_keys.first}):"
+    when 2 then puts "Choose a square (#{unmarked_keys.join(' or ')}):"
+    else print "Choose a square "
+         puts "(#{unmarked_keys[0..-2].join(', ')}, or #{unmarked_keys.last}):"
+    end
+  end
+
+  def display_result
+    clear_screen_and_display_board
+
+    case board.winning_marker
+    when human.marker
+      puts "You won!"
+    when computer.marker
+      puts "#{computer.name} won!"
+    else
+      puts "It's a tie!"
+    end
+
+    display_score
+  end
+
+  # rubocop:disable Metrics/LineLength
+  def display_score
+    puts "The score is #{human.name}: #{score[:human]}, #{computer.name} #{score[:computer]}"
+  end
+  # rubocop:enable Metrics/LineLength
+end
+
 class Board
   WINNING_LINES = [[1, 2, 3], [4, 5, 6], [7, 8, 9]] + # rows
                   [[1, 4, 7], [2, 5, 8], [3, 6, 9]] + # cols
                   [[1, 5, 9], [3, 5, 7]]              # diagonals
+
+  attr_accessor :squares
 
   def initialize
     @squares = {}
@@ -9,19 +112,19 @@ class Board
   end
 
   def reset
-    (1..9).each { |key| @squares[key] = Square.new }
+    (1..9).each { |key| squares[key] = Square.new }
   end
 
   def [](num)
-    @squares[num]
+    squares[num]
   end
 
   def []=(num, marker)
-    @squares[num].marker = marker
+    squares[num].marker = marker
   end
 
   def unmarked_keys
-    @squares.keys.select { |key| @squares[key].unmarked? }
+    squares.keys.select { |key| squares[key].unmarked? }
   end
 
   def full?
@@ -34,28 +137,20 @@ class Board
 
   def winning_marker
     WINNING_LINES.each do |line|
-      squares = @squares.values_at(*line)
-      if three_identical_markers?(squares)
-        return squares.first.marker
+      squares_array = squares.values_at(*line)
+      if three_identical_markers?(squares_array)
+        return squares_array.first.marker
       end
     end
     nil
   end
 
-  def find_offensive_square
-    array_of_winning_lines.each do |line|
-      square = find_best_square(line, TTTGame::COMPUTER_MARKER)
-      return @squares.key(square) if square
+  def array_of_winning_lines
+    array = []
+    WINNING_LINES.each do |line|
+      array << squares.values_at(*line)
     end
-    nil
-  end
-
-  def find_defensive_square
-    array_of_winning_lines.each do |line|
-      square = find_best_square(line, TTTGame.human_marker)
-      return @squares.key(square) if square
-    end
-    nil
+    array
   end
 
   def offensive_square_needed?
@@ -80,33 +175,25 @@ class Board
 
   # rubocop:disable Metrics/AbcSize
   # rubocop:disable Metrics/MethodLength
-  def draw
+  def draw_board
     puts ""
     puts "     |     |"
-    puts "  #{@squares[1]}  |  #{@squares[2]}  |  #{@squares[3]}"
+    puts "  #{squares[1]}  |  #{squares[2]}  |  #{squares[3]}"
     puts "     |     |"
     puts "-----+-----+-----"
     puts "     |     |"
-    puts "  #{@squares[4]}  |  #{@squares[5]}  |  #{@squares[6]}"
-    puts "     |     |"
-    puts "-----+-----+-----"
-    puts "     |     |"
-    puts "  #{@squares[7]}  |  #{@squares[8]}  |  #{@squares[9]}"
-    puts "     |     |"
+    puts "  #{squares[4]}  |  #{squares[5]}  |  #{squares[6]}"
+    puts "     |     |       1 | 2 | 3 "
+    puts "-----+-----+----- ---+---+---"
+    puts "     |     |       4 | 5 | 6 "
+    puts "  #{squares[7]}  |  #{squares[8]}  |  #{squares[9]}   ---+---+---"
+    puts "     |     |       7 | 8 | 9 "
     puts ""
   end
   # rubocop:enable Metrics/AbcSize
   # rubocop:enable Metrics/MethodLength
 
   private
-
-  def array_of_winning_lines
-    array = []
-    WINNING_LINES.each do |line|
-      array << @squares.values_at(*line)
-    end
-    array
-  end
 
   def three_identical_markers?(squares)
     markers = squares.select(&:marked?).map(&:marker)
@@ -116,17 +203,9 @@ class Board
 
   def two_identical_markers?(winning_line, player)
     markers = winning_line.select { |line| line.player_marked?(player) }
-
     markers.map(&:marker)
     return false if markers.size != 2
     true
-  end
-
-  def find_best_square(line, marker)
-    if line.count { |square| square.marker == marker } == 2 &&
-       line.count { |square| square.marker == Square::INITIAL_MARKER } == 1
-      line.select { |square| square.marker == Square::INITIAL_MARKER }.first
-    end
   end
 end
 
@@ -159,32 +238,166 @@ class Square
   end
 end
 
-class Player
-  attr_accessor :name, :marker, :score
+class Player # Create Human and Computer Classes
+  include Display
+
+  attr_accessor :name, :marker
 
   def initialize(name, marker)
     @name = name
     @marker = marker
-    @score = 0
+  end
+end
+
+class Human < Player
+  def choose_name
+    chosen_name = nil
+    loop do
+      puts "What is your name?"
+      chosen_name = gets.chomp.strip
+      break unless chosen_name.empty?
+      puts "Sorry, you must enter at least one character."
+    end
+    @name = chosen_name
+  end
+
+  def choose_marker
+    answer = nil
+    loop do
+      display_marker_prompt
+      answer = gets.chomp.strip
+      break unless answer.size != 1 || ['o', 'O'].include?(answer)
+      display_marker_errors(answer)
+    end
+    @marker = answer
+    TTTGame.human_marker = answer
+  end
+
+  def choose_player_order(opponent)
+    decision = choose_who_chooses_to_go_first
+    if decision == 'y'
+      choose_who_goes_first(opponent)
+    elsif decision == 'n'
+      computer.choose_who_goes_first(opponent)
+    end
+  end
+
+  def choose_who_chooses_to_go_first
+    answer = ''
+    loop do
+      puts "Would you like to choose who goes first? (y/n):"
+      answer = gets.chomp.downcase
+      break if %w(y n).include?(answer)
+      puts "Sorry that is an invalid answer, must choose yes (y) or no (n)."
+    end
+    answer
+  end
+
+  def choose_who_goes_first(opponent)
+    case first_move_decision(opponent)
+    when 'h' then marker
+    when 'c' then TTTGame::COMPUTER_MARKER
+    end
+  end
+
+  def first_move_decision(opponent)
+    decision = ''
+    loop do
+      puts "Who do you want to go first, yourself (h) or #{opponent.name} (c)?"
+      decision = gets.chomp.downcase
+      break if %w(h c).include?(decision)
+      puts "Sorry that is an invalid answer, must be human(h) or computer(c)."
+    end
+    decision
+  end
+
+  def turn(board)
+    display_square_choices(board)
+    square = nil
+    loop do
+      square = gets.chomp.to_i
+      break if board.unmarked_keys.include?(square)
+      puts "Sorry, that's not a valid choice."
+    end
+    board[square] = marker
+  end
+end
+
+class Computer < Player
+  def choose_name
+    @name = %w(Gonko Beeboop MrRoboto Cortana).sample
+  end
+
+  def choose_who_goes_first(opponent)
+    choice = [opponent.name, name].sample
+    puts "#{opponent.name} chooses #{choice} to go first!"
+    puts "press enter to continue."
+    gets
+
+    @current_marker = case choice
+                      when name then marker
+                      when opponent.name then TTTGame::COMPUTER_MARKER
+                      end
+  end
+
+  def turn(board)
+    square = find_offensive_square(board)
+    square ||= find_defensive_square(board)
+    square ||= 5 if board[5].unmarked?
+    square ||= board.unmarked_keys.sample
+
+    board[square] = marker
+  end
+
+  def find_offensive_square(board)
+    board.array_of_winning_lines.each do |line|
+      square = find_best_square(line, TTTGame::COMPUTER_MARKER)
+      return board.squares.key(square) if square
+    end
+    nil
+  end
+
+  def find_defensive_square(board)
+    board.array_of_winning_lines.each do |line|
+      square = find_best_square(line, TTTGame.human_marker)
+      return board.squares.key(square) if square
+    end
+    nil
+  end
+
+  def find_best_square(line, marker)
+    if line.count { |square| square.marker == marker } == 2 &&
+       line.count { |square| square.marker == Square::INITIAL_MARKER } == 1
+      line.select { |square| square.marker == Square::INITIAL_MARKER }.first
+    end
   end
 end
 
 class TTTGame
+  include Display
+
   COMPUTER_MARKER = 'O'
   @@human_marker = nil
+  WINNING_ROUNDS = 3
 
-  attr_reader :board, :human, :computer
+  attr_accessor :current_marker
+  attr_reader :board, :human, :computer, :score
 
   def initialize
     @board = Board.new
-    @human = Player.new(nil, nil)
-    @computer = Player.new(choose_computer_name, COMPUTER_MARKER)
+    @human = Human.new(nil, nil)
+    @computer = Computer.new(nil, COMPUTER_MARKER)
     @current_marker = nil
     @round_starter = nil
+    @score = { human: 0, computer: 0 }
   end
 
   def self.human_marker
     @@human_marker
+  end
+
+  def self.human_marker=(symbol)
+    @@human_marker = (symbol)
   end
 
   def play
@@ -203,38 +416,40 @@ class TTTGame
       players_turns
       increment_score
       display_result
+      return if winning_rounds_reached?
       break unless play_again?
       reset_game
-      display_reset_game_message
     end
+  end
+
+  def winning_rounds_reached?
+    score.values.include?(WINNING_ROUNDS)
   end
 
   def clear_screen
     system 'clear'
   end
 
-  def choose_computer_name
-    %w(Gonko Beeboop MrRoboto Cortana).sample
-  end
-
-  def display_welcome_message
-    puts "Welcome to Tic Tac Toe!"
-  end
-
   def game_setup
     if @round_starter.nil?
       game_setup_choices
+      clear_screen_and_display_board
     else
       play_again_setup
     end
   end
 
   def game_setup_choices
-    choose_human_name
+    choose_names
     display_player_names
-    choose_marker
-    choose_player_order
+    human.choose_marker
+    @current_marker = human.choose_player_order(computer)
     @round_starter = @current_marker
+  end
+
+  def choose_names
+    human.choose_name
+    computer.choose_name
   end
 
   def play_again_setup
@@ -244,163 +459,6 @@ class TTTGame
     puts "Press enter to continue."
     gets
   end
-
-  def display_player
-    case @round_starter
-    when human.marker then human.name
-    when COMPUTER_MARKER then computer.name
-    end
-  end
-
-  def choose_human_name
-    name = nil
-    loop do
-      puts "What is your name?"
-      name = gets.chomp.strip
-      break unless name.empty?
-      puts "Sorry, you must enter at least one character."
-    end
-    human.name = name
-  end
-
-  def display_player_names
-    puts "Lovely to meet you #{human.name}!"
-    puts "Your opponent is #{computer.name}"
-    puts "press enter to continue."
-    gets
-    clear_screen_and_display_board
-  end
-
-  def choose_marker
-    answer = nil
-    loop do
-      display_marker_prompt
-      answer = gets.chomp.strip
-      break unless answer.size != 1 || ['o', 'O'].include?(answer)
-      display_marker_errors(answer)
-    end
-    @human.marker = answer
-    @@human_marker = answer
-  end
-
-  def display_marker_prompt
-    puts "What would you like your marker to be?"
-    puts "Choose any single character other than 'O':"
-  end
-
-  def display_marker_errors(answer)
-    if answer.size != 1
-      puts "Sorry, marker must be one character."
-    elsif ['o', 'O'].include?(answer)
-      puts "Sorry, #{computer.name} already claimed 'O' as their marker!"
-    end
-  end
-
-  def choose_player_order
-    decision = choose_who_chooses_to_go_first
-    if decision == 'y'
-      human_choose_who_goes_first
-    elsif decision == 'n'
-      computer_choose_who_goes_first
-    end
-  end
-
-  def choose_who_chooses_to_go_first
-    answer = ''
-    loop do
-      puts "Would you like to choose who goes first? (y/n):"
-      answer = gets.chomp.downcase
-      break if %w(y n).include?(answer)
-      puts "Sorry that is an invalid answer, must choose yes (y) or no (n)."
-    end
-    answer
-  end
-
-  def first_move_decision
-    decision = ''
-    loop do
-      puts "Who do you want to go first, yourself (h) or #{computer.name} (c)?"
-      decision = gets.chomp.downcase
-      break if %w(h c).include?(decision)
-      puts "Sorry that is an invalid answer, must be human(h) or computer(c)."
-    end
-    decision
-  end
-
-  def human_choose_who_goes_first
-    decision = first_move_decision
-    @current_marker = case decision
-                      when 'h' then human.marker
-                      when 'c' then COMPUTER_MARKER
-                      end
-    clear_screen_and_display_board
-  end
-
-  def computer_choose_who_goes_first
-    choice = [human.name, computer.name].sample
-    puts "#{computer.name} chooses #{choice} to go first!"
-    puts "press enter to continue."
-    gets
-    clear_screen_and_display_board
-
-    @current_marker = case choice
-                      when human.name then human.marker
-                      when computer.name then COMPUTER_MARKER
-                      end
-  end
-
-  def display_goodbye_message
-    puts "Thanks for playing Tic Tac Toe! Goodbye!"
-  end
-
-  def display_board
-    if !human.marker.nil?
-      puts "You're #{human.marker}. #{computer.name} is #{computer.marker}."
-    end
-    board.draw
-  end
-
-  def clear_screen_and_display_board
-    clear_screen
-    display_board
-  end
-
-  def display_square_choices
-    unmarked_keys = board.unmarked_keys
-    case board.unmarked_keys.size
-    when 1 then puts "Choose a square (#{unmarked_keys.first}):"
-    when 2 then puts "Choose a square (#{unmarked_keys.join(' or ')}):"
-    else print "Choose a square "
-         puts "(#{unmarked_keys[0..-2].join(', ')}, or #{unmarked_keys.last}):"
-    end
-  end
-
-  def human_moves
-    display_square_choices
-    square = nil
-    loop do
-      square = gets.chomp.to_i
-      break if board.unmarked_keys.include?(square)
-      puts "Sorry, that's not a valid choice."
-    end
-    board[square] = human.marker
-  end
-
-  # rubocop:disable Metrics/AbcSize
-  def computer_moves
-    square = if board.offensive_square_needed?
-               board.find_offensive_square
-             elsif board.defensive_square_needed?
-               board.find_defensive_square
-             elsif board[5].unmarked?
-               5
-             else
-               board.unmarked_keys.sample
-             end
-
-    board[square] = computer.marker
-  end
-  # rubocop:enable Metrics/AbcSize
 
   def human_turn?
     @current_marker == human.marker
@@ -426,12 +484,6 @@ class TTTGame
     end
   end
 
-  def current_player_moves
-    human_moves if @current_marker == human.marker
-    computer_moves if @current_marker == COMPUTER_MARKER
-    change_whose_turn
-  end
-
   def players_turns
     loop do
       current_player_moves
@@ -440,30 +492,15 @@ class TTTGame
     end
   end
 
+  def current_player_moves
+    human.turn(board) if @current_marker == human.marker
+    computer.turn(board) if @current_marker == COMPUTER_MARKER
+    change_whose_turn
+  end
+
   def increment_score
-    human.score += 1 if board.winning_marker == human.marker
-    computer.score += 1 if board.winning_marker == computer.marker
-  end
-
-  def display_score
-    human_info = "#{human.name}: #{human.score}"
-    computer_info = "#{computer.name}: #{computer.score}"
-    puts "The score is #{human_info}, #{computer_info}"
-  end
-
-  def display_result
-    clear_screen_and_display_board
-
-    case board.winning_marker
-    when human.marker
-      puts "You won!"
-    when computer.marker
-      puts "#{computer.name} won!"
-    else
-      puts "It's a tie!"
-    end
-
-    display_score
+    score[:human] += 1 if board.winning_marker == human.marker
+    score[:computer] += 1 if board.winning_marker == computer.marker
   end
 
   def play_again?
@@ -478,14 +515,10 @@ class TTTGame
     answer == 'y'
   end
 
-  def display_reset_game_message
-    puts "Let's play again!"
-    puts ''
-  end
-
   def reset_game
     board.reset
     clear_screen
+    display_reset_game_message
   end
 end
 
