@@ -36,7 +36,7 @@ module Display
   def display_player
     case @round_starter
     when human.marker then human.name
-    when TTTGame::COMPUTER_MARKER then computer.name
+    when Computer::COMPUTER_MARKER then computer.name
     end
   end
 
@@ -233,7 +233,7 @@ class Square
   def player_marked?(player)
     case player
     when 'human' then marker == TTTGame.human_marker
-    when 'computer' then marker == TTTGame::COMPUTER_MARKER
+    when 'computer' then marker == Computer::COMPUTER_MARKER
     end
   end
 end
@@ -270,7 +270,6 @@ class Human < Player
       display_marker_errors(answer)
     end
     @marker = answer
-    TTTGame.human_marker = answer
   end
 
   def choose_player_order(opponent)
@@ -278,7 +277,7 @@ class Human < Player
     if decision == 'y'
       choose_who_goes_first(opponent)
     elsif decision == 'n'
-      computer.choose_who_goes_first(opponent)
+      opponent.choose_who_goes_first(opponent)
     end
   end
 
@@ -296,7 +295,7 @@ class Human < Player
   def choose_who_goes_first(opponent)
     case first_move_decision(opponent)
     when 'h' then marker
-    when 'c' then TTTGame::COMPUTER_MARKER
+    when 'c' then Computer::COMPUTER_MARKER
     end
   end
 
@@ -324,6 +323,8 @@ class Human < Player
 end
 
 class Computer < Player
+  COMPUTER_MARKER = 'O'
+
   def choose_name
     @name = %w(Gonko Beeboop MrRoboto Cortana).sample
   end
@@ -336,13 +337,13 @@ class Computer < Player
 
     @current_marker = case choice
                       when name then marker
-                      when opponent.name then TTTGame::COMPUTER_MARKER
+                      when opponent.name then COMPUTER_MARKER
                       end
   end
 
-  def turn(board)
+  def turn(board, human)
     square = find_offensive_square(board)
-    square ||= find_defensive_square(board)
+    square ||= find_defensive_square(board, human)
     square ||= 5 if board[5].unmarked?
     square ||= board.unmarked_keys.sample
 
@@ -351,15 +352,15 @@ class Computer < Player
 
   def find_offensive_square(board)
     board.array_of_winning_lines.each do |line|
-      square = find_best_square(line, TTTGame::COMPUTER_MARKER)
+      square = find_best_square(line, COMPUTER_MARKER)
       return board.squares.key(square) if square
     end
     nil
   end
 
-  def find_defensive_square(board)
+  def find_defensive_square(board, human)
     board.array_of_winning_lines.each do |line|
-      square = find_best_square(line, TTTGame.human_marker)
+      square = find_best_square(line, human.marker)
       return board.squares.key(square) if square
     end
     nil
@@ -376,8 +377,6 @@ end
 class TTTGame
   include Display
 
-  COMPUTER_MARKER = 'O'
-  @@human_marker = nil
   WINNING_ROUNDS = 3
 
   attr_accessor :current_marker
@@ -386,18 +385,10 @@ class TTTGame
   def initialize
     @board = Board.new
     @human = Human.new(nil, nil)
-    @computer = Computer.new(nil, COMPUTER_MARKER)
+    @computer = Computer.new(nil, Computer::COMPUTER_MARKER)
     @current_marker = nil
     @round_starter = nil
     @score = { human: 0, computer: 0 }
-  end
-
-  def self.human_marker
-    @@human_marker
-  end
-
-  def self.human_marker=(symbol)
-    @@human_marker = (symbol)
   end
 
   def play
@@ -413,7 +404,7 @@ class TTTGame
     loop do
       display_board
       game_setup
-      players_turns
+      players_turns(human, computer)
       increment_score
       display_result
       return if winning_rounds_reached?
@@ -465,42 +456,42 @@ class TTTGame
   end
 
   def computer_turn?
-    @current_marker == COMPUTER_MARKER
+    @current_marker == Computer::COMPUTER_MARKER
   end
 
   def change_whose_turn
     if @current_marker == human.marker
-      @current_marker = COMPUTER_MARKER
-    elsif @current_marker == COMPUTER_MARKER
+      @current_marker = Computer::COMPUTER_MARKER
+    elsif @current_marker == Computer::COMPUTER_MARKER
       @current_marker = human.marker
     end
   end
 
   def change_round_starter
     if @round_starter == human.marker
-      @round_starter = COMPUTER_MARKER
-    elsif @round_starter == COMPUTER_MARKER
+      @round_starter = Computer::COMPUTER_MARKER
+    elsif @round_starter == Computer::COMPUTER_MARKER
       @round_starter = human.marker
     end
   end
 
-  def players_turns
+  def players_turns(human, computer)
     loop do
-      current_player_moves
+      current_player_moves(human, computer)
       break if board.someone_won? || board.full?
       clear_screen_and_display_board if human_turn?
     end
   end
 
-  def current_player_moves
+  def current_player_moves(human, computer)
     human.turn(board) if @current_marker == human.marker
-    computer.turn(board) if @current_marker == COMPUTER_MARKER
+    computer.turn(board, human) if @current_marker == Computer::COMPUTER_MARKER
     change_whose_turn
   end
 
   def increment_score
     score[:human] += 1 if board.winning_marker == human.marker
-    score[:computer] += 1 if board.winning_marker == computer.marker
+    score[:computer] += 1 if board.winning_marker == Computer::COMPUTER_MARKER
   end
 
   def play_again?
