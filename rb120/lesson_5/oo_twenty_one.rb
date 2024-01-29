@@ -1,15 +1,7 @@
 require 'yaml'
 
-class Participant
-  attr_reader :name
-  attr_accessor :hand, :total
-
-  def initialize(name)
-    @name = name
-    @hand = []
-    @total = 0
-  end
-
+# rubocop:disable Metrics/ModuleLength
+module Display
   def display_hand
     hand.count { print "+-----+ " }
     puts
@@ -23,13 +15,85 @@ class Participant
     puts
   end
 
-  def busted?
-    total > 21
+  def display_player_end_of_turn_message
+    if busted?
+      puts "Your total is #{total}! You busted!"
+    else
+      puts "Your final total is #{total}. Now it's the dealer's turn."
+    end
+    puts "Press enter to continue"
+    gets
   end
 
-  def update_total
-    total = hand.map(&:value).sum
-    aces_one_or_eleven(total)
+  def display_dealer_choice
+    choice = if total < 17
+               'hits'
+             elsif total >= 17
+               'stays'
+             end
+
+    puts "The dealer's total is #{total}. The dealer #{choice}."
+    puts "Press enter to continue."
+    gets
+  end
+
+  def display_dealer_end_of_turn_message
+    if busted?
+      puts "The dealer's total is #{total}. The dealer busts!"
+    else
+      puts "Time to compare totals!"
+    end
+    puts "Press enter to continue."
+    gets
+  end
+
+  def display_rules?
+    answer = nil
+    loop do
+      answer = gets.chomp.downcase
+      break if %w(y n).include?(answer)
+      puts "Invalid Input, type 'y' to see the rules or 'n' to start the game."
+    end
+    clear_screen
+    answer == 'y'
+  end
+
+  MESSAGES = YAML.load_file('oo_twenty_one.yml')
+
+  def display_rules
+    puts MESSAGES['rules_intro']
+    gets
+    puts MESSAGES['card_values']
+    gets
+    puts MESSAGES['player_turn']
+    gets
+    puts MESSAGES['dealer_turn']
+    gets
+    puts MESSAGES['winning']
+    gets
+  end
+
+  def display_initial_cards
+    display_all_cards
+    puts "------------------------"
+    puts "Press enter to continue."
+    gets
+  end
+
+  def display_result
+    display_all_cards
+    update_score
+    display_winner
+  end
+
+  def display_goodbye_message(score)
+    puts
+    if champion
+      winner = score.key(Game::CHAMPION_NUM)
+      rounds = Game::CHAMPION_NUM
+      puts "#{winner} won #{rounds} rounds first and is the champion!"
+    end
+    puts "Thanks for playing Twenty-one! Goodbye!"
   end
 
   private
@@ -60,6 +124,57 @@ class Participant
     end
   end
 
+  def display_all_cards
+    clear_screen
+    puts "Your cards are:"
+    player.display_hand
+    puts "The dealer's cards are:"
+    dealer.display_hand
+  end
+
+  def display_winner
+    player_score = score[player.name]
+    dealer_score = score[dealer.name]
+    puts "----------------------------------------"
+    display_round_result
+    puts "The score is #{player.name}: #{player_score}, Dealer: #{dealer_score}"
+  end
+
+  def display_round_result
+    name = player.name
+    puts "The totals are #{name}: #{player.total}, Dealer: #{dealer.total}"
+    if push
+      puts "It's a push!"
+    else
+      puts "#{winner} wins!"
+    end
+  end
+end
+# rubocop:enable Metrics/ModuleLength
+
+class Participant
+  include Display
+
+  attr_reader :name
+  attr_accessor :hand, :total
+
+  def initialize(name)
+    @name = name
+    @hand = []
+    @total = 0
+  end
+
+  def busted?
+    total > 21
+  end
+
+  def update_total
+    total = hand.map(&:value).sum
+    aces_one_or_eleven(total)
+  end
+
+  private
+
   def aces_one_or_eleven(total)
     aces = 0
     hand.each { |card| aces += 1 if card.num == 'A' }
@@ -79,6 +194,16 @@ class Participant
 end
 
 class Player < Participant
+  attr_writer :name
+
+  def turn(delaer)
+    clear_screen
+    hit_or_stay(delaer)
+    display_player_end_of_turn_message
+  end
+
+  private
+
   def choose_hit_or_stay?
     answer = nil
     loop do
@@ -90,13 +215,6 @@ class Player < Participant
     false unless answer == 'y'
   end
 
-  def turn(opponent)
-    clear_screen
-    opponent.put_hidden_card_in_hand
-    hit_or_stay(opponent)
-    display_end_of_turn_message
-  end
-
   def hit_or_stay(dealer)
     loop do
       display_hand
@@ -106,16 +224,6 @@ class Player < Participant
       dealer.deal_card(hand)
       @total = update_total
     end
-  end
-
-  def display_end_of_turn_message
-    if busted?
-      puts "Your total is #{total}! You busted!"
-    else
-      puts "Your final total is #{total}. Now it's the dealer's turn."
-    end
-    puts "Press enter to continue"
-    gets
   end
 end
 
@@ -140,17 +248,20 @@ class Dealer < Participant
     deck.remaining_cards.delete(card)
   end
 
+  def turn(opponent)
+    clear_screen
+    put_hidden_card_in_hand
+    return if opponent.busted?
+    hit_or_stay
+    display_dealer_end_of_turn_message
+    clear_screen
+  end
+
+  private
+
   def put_hidden_card_in_hand
     hand << hidden_card[0]
     @total = update_total
-  end
-
-  def turn(opponent)
-    clear_screen
-    return if opponent.busted?
-    hit_or_stay
-    display_end_of_turn_message
-    clear_screen
   end
 
   def hit_or_stay
@@ -168,28 +279,6 @@ class Dealer < Participant
   def choose_hit_or_stay?
     return true if total < 17
     false
-  end
-
-  def display_dealer_choice
-    choice = if total < 17
-               'hits'
-             elsif total >= 17
-               'stays'
-             end
-
-    puts "The dealer's total is #{total}. The dealer #{choice}."
-    puts "Press enter to continue."
-    gets
-  end
-
-  def display_end_of_turn_message
-    if busted?
-      puts "The dealer's total is #{total}. The dealer busts!"
-    else
-      puts "Time to compare totals!"
-    end
-    puts "Press enter to continue."
-    gets
   end
 end
 
@@ -231,23 +320,24 @@ class Cards
 end
 
 class Game
+  include Display
+
+  CHAMPION_NUM = 3
+
   attr_reader :player, :dealer, :score
 
   def initialize
-    @player = Player.new('Player')
+    @player = Player.new(nil)
     @dealer = Dealer.new('Dealer')
-    @score = { player: 0, dealer: 0 }
   end
 
   def start
     game_intro
     main_game
-    display_goodbye_message
+    display_goodbye_message(score)
   end
 
   private
-
-  MESSAGES = YAML.load_file('oo_twenty_one.yml')
 
   def main_game
     loop do
@@ -257,42 +347,41 @@ class Game
       player.turn(dealer)
       dealer.turn(player)
       display_result
-      break unless play_again?
+      break unless new_round?
       reset_game
     end
   end
 
   def game_intro
     clear_screen
-    puts "Welcome to twenty-one! Do you want to see the rules? (y/n):"
+    choose_name
+    prompt_rules
+    set_scoreboard
+  end
+
+  def set_scoreboard
+    @score = { player.name => 0, dealer.name => 0 }
+  end
+
+  def choose_name
+    puts "Welcome to Twenty-One! What is your name?"
+    name = nil
+    loop do
+      name = gets.chomp.strip.capitalize
+      break unless name.empty?
+      puts "Sorry, you must enter at least one character."
+    end
+    player.name = name
+  end
+
+  def prompt_rules
+    puts "Do you want to see the rules? (y/n):"
     unless display_rules?
       puts "Let's begin! Press enter to start."
       gets
       return
     end
     display_rules
-  end
-
-  def display_rules?
-    answer = nil
-    loop do
-      answer = gets.chomp.downcase
-      break if %w(y n).include?(answer)
-      puts "Invalid Input, type 'y' to see the rules or 'n' to start the game."
-    end
-    answer == 'y'
-  end
-
-  def display_rules
-    clear_screen
-    puts MESSAGES['rules_intro']
-    gets
-    puts MESSAGES['card_values']
-    gets
-    puts MESSAGES['player_turn']
-    gets
-    puts MESSAGES['dealer_turn']
-    gets
   end
 
   def update_totals
@@ -302,62 +391,51 @@ class Game
 
   def update_score
     return if push
-    score[:player] += 1 if winner == 'Player'
-    score[:dealer] += 1 if winner == 'Dealer'
+    score[player.name] += 1 if winner == player.name
+    score[dealer.name] += 1 if winner == dealer.name
   end
 
-  def display_initial_cards
-    display_all_cards
-    puts "------------------------"
-    puts "Press enter to continue."
-    gets
-  end
-
-  def display_all_cards
-    clear_screen
-    puts "Your cards are:"
-    player.display_hand
-    puts "The dealer's cards are:"
-    dealer.display_hand
-  end
-
-  def display_result
-    display_all_cards
-    display_winner
-  end
-
-  def display_winner
-    puts "-------------------------------------"
-    puts "The totals are Player: #{player.total}, Dealer: #{dealer.total}"
-    if push
-      puts "It's a push!"
-    else
-      update_score
-      puts "#{winner} wins!"
-    end
-    puts
-    puts "The score is Player: #{score[:player]}, Dealer: #{score[:dealer]}"
-  end
-
-  # rubocop:disable Lint/DuplicateBranch
   def winner
-    if dealer.busted?
-      'Player'
-    elsif player.busted?
-      'Dealer'
-    elsif player.total > dealer.total
-      'Player'
-    elsif player.total < dealer.total
-      'Dealer'
+    if player.busted? || dealer.busted?
+      winner_from_bust
+    else
+      winner_from_points
     end
   end
-  # rubocop:enable Lint/DuplicateBranch
+
+  def winner_from_bust
+    if dealer.busted?
+      player.name
+    elsif player.busted?
+      dealer.name
+    end
+  end
+
+  def winner_from_points
+    if player.total > dealer.total
+      player.name
+    elsif player.total < dealer.total
+      dealer.name
+    end
+  end
 
   def push
     player.total == dealer.total
   end
 
+  def new_round?
+    return false if champion
+    return true if play_again?
+  end
+
+  def champion
+    champion = nil
+    champion = score.key(CHAMPION_NUM) if score.values.include?(CHAMPION_NUM)
+    champion
+  end
+
   def play_again?
+    puts
     answer = nil
     loop do
       puts "Do you want to play again? (y/n):"
@@ -373,10 +451,6 @@ class Game
     player.hand = []
     dealer.hand = []
     dealer.hidden_card = []
-  end
-
-  def display_goodbye_message
-    puts "Thanks for playing twenty-one! Goodbye!"
   end
 
   def clear_screen
