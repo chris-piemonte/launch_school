@@ -359,10 +359,6 @@ class Game
     set_scoreboard
   end
 
-  def set_scoreboard
-    @score = { player.name => 0, dealer.name => 0 }
-  end
-
   def choose_name
     puts "Welcome to Twenty-One! What is your name?"
     name = nil
@@ -382,6 +378,10 @@ class Game
       return
     end
     display_rules
+  end
+
+  def set_scoreboard
+    @score = { player.name => 0, dealer.name => 0 }
   end
 
   def update_totals
