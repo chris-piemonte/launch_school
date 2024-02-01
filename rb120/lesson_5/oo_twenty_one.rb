@@ -1,20 +1,4 @@
-require 'yaml'
-
-# rubocop:disable Metrics/ModuleLength
-module Display
-  def display_hand
-    hand.count { print "+-----+ " }
-    puts
-    display_top_numbers
-    puts
-    display_suits
-    puts
-    display_bottom_numbers
-    puts
-    hand.count { print "+-----+ " }
-    puts
-  end
-
+module DisplayMessages
   def display_player_end_of_turn_message
     if busted?
       puts "Your total is #{total}! You busted!"
@@ -73,69 +57,29 @@ module Display
     gets
   end
 
-  def display_initial_cards
-    display_all_cards
-    puts "------------------------"
-    puts "Press enter to continue."
-    gets
-  end
-
   def display_result
-    display_all_cards
+    display_all_cards(player, dealer)
     update_score
     display_winner
   end
 
-  def display_goodbye_message(score)
+  def display_game_over_message(score)
     puts
-    if champion
-      winner = score.key(Game::CHAMPION_NUM)
-      rounds = Game::CHAMPION_NUM
-      puts "#{winner} won #{rounds} rounds first and is the champion!"
-    end
+    return unless champion
+    winner = score.key(Game::CHAMPION_NUM)
+    rounds = Game::CHAMPION_NUM
+    puts "#{winner} won #{rounds} rounds first and is the champion!"
+  end
+
+  def display_goodbye_message
     puts "Thanks for playing Twenty-one! Goodbye!"
   end
 
   private
 
-  def display_top_numbers
-    hand.each do |card|
-      if card.num == "10"
-        print "|#{card.num}   | "
-      else
-        print "|#{card.num}    | "
-      end
-    end
-  end
-
-  def display_bottom_numbers
-    hand.each do |card|
-      if card.num == "10"
-        print "|   #{card.num}| "
-      else
-        print "|    #{card.num}| "
-      end
-    end
-  end
-
-  def display_suits
-    hand.each do |card|
-      print "|  #{card.suit}  | "
-    end
-  end
-
-  def display_all_cards
-    clear_screen
-    puts "Your cards are:"
-    player.display_hand
-    puts "The dealer's cards are:"
-    dealer.display_hand
-  end
-
   def display_winner
     player_score = score[player.name]
     dealer_score = score[dealer.name]
-    puts "----------------------------------------"
     display_round_result
     puts "The score is #{player.name}: #{player_score}, Dealer: #{dealer_score}"
   end
@@ -150,10 +94,67 @@ module Display
     end
   end
 end
-# rubocop:enable Metrics/ModuleLength
+
+module DisplayCards
+  def display_hand
+    hand.count { print "+-----+ " }
+    puts
+    display_top_numbers
+    puts
+    display_suits
+    puts
+    display_bottom_numbers
+    puts
+    hand.count { print "+-----+ " }
+    puts
+  end
+
+  private
+
+  def display_top_numbers
+    hand.each do |card|
+      if card.rank == "10"
+        print "|#{card.rank}   | "
+      else
+        print "|#{card.rank}    | "
+      end
+    end
+  end
+
+  def display_bottom_numbers
+    hand.each do |card|
+      if card.rank == "10"
+        print "|   #{card.rank}| "
+      else
+        print "|    #{card.rank}| "
+      end
+    end
+  end
+
+  def display_suits
+    hand.each do |card|
+      print "|  #{card.suit}  | "
+    end
+  end
+
+  def display_all_cards(player, dealer)
+    clear_screen
+    puts "Your cards are:"
+    player.display_hand
+    if dealer.hand.size == 1
+      puts "The dealer's visible card is:"
+    else
+      puts "The dealer's cards are:"
+    end
+    dealer.display_hand
+    puts "------------------------"
+  end
+end
 
 class Participant
-  include Display
+  include DisplayMessages
+
+  BUSTED_NUMBER = 21
 
   attr_reader :name
   attr_accessor :hand, :total
@@ -165,7 +166,7 @@ class Participant
   end
 
   def busted?
-    total > 21
+    total >= BUSTED_NUMBER
   end
 
   def update_total
@@ -177,7 +178,7 @@ class Participant
 
   def aces_one_or_eleven(total)
     aces = 0
-    hand.each { |card| aces += 1 if card.num == 'A' }
+    hand.each { |card| aces += 1 if card.rank == 'A' }
     if total > 21 && aces > 0
       loop do
         total -= 10
@@ -194,11 +195,13 @@ class Participant
 end
 
 class Player < Participant
+  include DisplayCards
+
   attr_writer :name
 
-  def turn(delaer)
+  def turn(dealer)
     clear_screen
-    hit_or_stay(delaer)
+    hit_or_stay(self, dealer)
     display_player_end_of_turn_message
   end
 
@@ -215,9 +218,9 @@ class Player < Participant
     false unless answer == 'y'
   end
 
-  def hit_or_stay(dealer)
+  def hit_or_stay(player, dealer)
     loop do
-      display_hand
+      display_all_cards(player, dealer)
       break if busted?
       choice = choose_hit_or_stay?
       break if choice == false
@@ -228,6 +231,7 @@ class Player < Participant
 end
 
 class Dealer < Participant
+  include DisplayCards
   attr_accessor :deck, :hidden_card
 
   def initialize(name)
@@ -248,11 +252,11 @@ class Dealer < Participant
     deck.remaining_cards.delete(card)
   end
 
-  def turn(opponent)
+  def turn(player)
     clear_screen
     put_hidden_card_in_hand
-    return if opponent.busted?
-    hit_or_stay
+    return if player.busted?
+    hit_or_stay(player, self)
     display_dealer_end_of_turn_message
     clear_screen
   end
@@ -264,9 +268,9 @@ class Dealer < Participant
     @total = update_total
   end
 
-  def hit_or_stay
+  def hit_or_stay(player, dealer)
     loop do
-      display_hand
+      display_all_cards(player, dealer)
       break if busted?
       choice = choose_hit_or_stay?
       display_dealer_choice
@@ -289,38 +293,38 @@ class Deck
     @remaining_cards = new_deck
   end
 
+  private
+
   def new_deck
     deck = []
-    Cards::NUMBERS.keys.each do |num|
-      Cards::SUITS.each do |suit|
-        deck << Cards.new(num, suit)
+    Card::NUMBERS.each do |rank, value|
+      Card::SUITS.each do |suit|
+        deck << Card.new(rank, value, suit)
       end
     end
     deck
   end
 end
 
-class Cards
-  SUITS = %w(H D C S)
+class Card
+  SUITS = ["\u2660", "\u2663", "\u2665", "\u2666"]
   NUMBERS = {
     "2" => 2, "3" => 3, "4" => 4, "5" => 5, "6" => 6, "7" => 7, "8" => 8,
     "9" => 9, "10" => 10, "J" => 10, "Q" => 10, "K" => 10, "A" => 11
   }
 
-  attr_reader :num, :suit
+  attr_reader :rank, :suit, :value
 
-  def initialize(num, suit)
-    @num = num
+  def initialize(rank, value, suit)
+    @rank = rank
+    @value = value
     @suit = suit
-  end
-
-  def value
-    NUMBERS[num]
   end
 end
 
 class Game
-  include Display
+  include DisplayMessages
+  include DisplayCards
 
   CHAMPION_NUM = 3
 
@@ -333,22 +337,31 @@ class Game
 
   def start
     game_intro
-    main_game
-    display_goodbye_message(score)
+    entire_game
+    display_goodbye_message
   end
 
   private
 
-  def main_game
+  def entire_game
+    loop do
+      main_gameplay
+      display_game_over_message(score)
+      break unless champion && play_again?
+      reset_game
+    end
+  end
+
+  def main_gameplay
     loop do
       dealer.deal_initial_cards(player)
-      display_initial_cards
+      display_all_cards(player, dealer)
       update_totals
       player.turn(dealer)
       dealer.turn(player)
       display_result
       break unless new_round?
-      reset_game
+      reset_round
     end
   end
 
@@ -446,11 +459,16 @@ class Game
     answer == 'y'
   end
 
-  def reset_game
+  def reset_round
     dealer.deck = Deck.new
     player.hand = []
     dealer.hand = []
     dealer.hidden_card = []
+  end
+
+  def reset_game
+    set_scoreboard
+    reset_round
   end
 
   def clear_screen
