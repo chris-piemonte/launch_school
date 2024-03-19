@@ -18,7 +18,7 @@ ALGORITHM
   - if the element is greater than the return value, reassign it to the element
 - return the return value
 =end
-require 'pry'
+
 def max_by(array)
   answer = array.first
   array.each do |ele|
