@@ -1,9 +1,7 @@
 =begin
 
 PROBLEM
-
 Write a program to determine whether a triangle is equilateral, isosceles, or scalene
-
 input: 3 numbers
 output: string describing type of triangle (equilateral, isosceles, scalene)
 rules
@@ -48,13 +46,23 @@ class Triangle
     false
   end
 
+  # def kind
+  #   if sides[0] == sides[1] && sides[1] == sides[2]
+  #     'equilateral'
+  #   elsif sides[0] == sides[1] || sides[1] == sides[2] || sides[2] == sides[0]
+  #     'isosceles'
+  #   else
+  #     'scalene'
+  #   end
+  # end
+
   def kind
-    if sides[0] == sides[1] && sides[1] == sides[2]
-      return 'equilateral'
-    elsif sides[0] == sides[1] || sides[1] == sides[2] || sides[2] == sides[0]
-      return 'isosceles'
+    if sides.uniq.size == 1
+      'equilateral'
+    elsif sides.uniq.size == 2
+      'isosceles'
     else
-      return 'scalene'
+      'scalene'
     end
   end
 end

@@ -80,12 +80,12 @@ class Scrabble
   }
 
   def initialize(word)
-    @word = word? word.downcase : ''
+    @word = word ? word.downcase : ''
   end
 
   def score
     points = 0
-    
+
     word.downcase.gsub(/[^a-z]/, '').chars.each do |char|
       VALUES.each do |letters, value|
         points += value if letters.include?(char)

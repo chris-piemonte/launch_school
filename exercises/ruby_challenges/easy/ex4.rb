@@ -49,7 +49,7 @@ class Anagram
   #   list.each do |list_word|
   #     next if word.downcase == list_word.downcase
   #     if word.downcase.chars.sort == list_word.downcase.chars.sort
-  #       anagrams << list_word 
+  #       anagrams << list_word
   #     end
   #   end
 
@@ -59,7 +59,7 @@ class Anagram
   def match(list)
     list.select do |list_word|
       word.downcase.chars.sort == list_word.downcase.chars.sort &&
-      word.downcase != list_word.downcase
+        word.downcase != list_word.downcase
     end
   end
 end

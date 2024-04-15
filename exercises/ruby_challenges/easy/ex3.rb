@@ -70,7 +70,7 @@ class RomanNumeral
   def initialize(num)
     @num = num
     raise(ArgumentError) unless valid_number?
-  end 
+  end
 
   def valid_number?
     num.instance_of?(Integer) && num >= 1 && num <= 3000

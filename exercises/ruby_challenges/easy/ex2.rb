@@ -49,12 +49,12 @@ class DNA
   end
 
   def valid_dna?
-    dna.class == String
+    dna.instance_of?(String)
   end
 
   def hamming_distance(other_dna)
     hamming_distance = 0
-    shortest_size = dna.size < other_dna.size ? dna.size : other_dna.size
+    shortest_size = [dna.size, other_dna.size].min
 
     shortest_size.times do |ind|
       hamming_distance += 1 if dna[ind] != other_dna[ind]
