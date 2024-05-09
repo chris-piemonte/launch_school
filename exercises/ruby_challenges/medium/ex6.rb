@@ -49,8 +49,6 @@ ALGORITHM
 # rubocop:enable Layout/LineLength
 
 class CustomSet
-  attr_reader :set
-
   def initialize(set=[])
     @set = set.uniq
   end
@@ -106,4 +104,8 @@ class CustomSet
     new_set = set + other_custom_set.set
     CustomSet.new(new_set.uniq.sort)
   end
+
+  protected
+
+  attr_reader :set
 end

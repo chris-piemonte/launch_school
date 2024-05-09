@@ -63,8 +63,6 @@ ALGORITHM
 # rubocop:enable Layout/LineLength
 
 class Element
-  attr_reader :datum, :next
-
   def initialize(datum, next_element=nil)
     @datum = datum
     @next = next_element
@@ -137,4 +135,8 @@ class SimpleLinkedList
 
     reversed_list
   end
+
+  protected
+
+  attr_reader :datum, :next
 end
