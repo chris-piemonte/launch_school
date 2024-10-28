@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Fluid Photo Gallery</title>
+    <meta charset="utf-8" name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      html {
+        background-color: black;
+        font: normal 16px Helvetica, Arial, sans-serif;
+      }
+
+      body {
+        display: grid;
+        grid-auto-rows: min-content;
+        grid-template-areas:
+          "header"
+          "main"
+          "footer";
+        background-color: gray;
+        color: white;
+        padding: 25px 20px 20px 20px;
+        margin: auto;
+      }
+
+      header {
+        grid-area: header;
+        justify-items: center;
+      }
+
+      h1 {
+        margin: 1.33rem 0;
+      }
+
+      main {
+        grid-area: main;
+        margin: 0 0 25px 0;
+      }
+
+      img {
+        display: block;
+        width: 100%;
+      }
+
+      main img {
+        max-width: 950px;
+        border: 15px solid white;
+      }
+
+      figcaption {
+        padding-top: 10px;
+      }
+
+      footer {
+        grid-area: footer;
+        display: flex;
+        justify-content: space-between;
+        margin: 0 -15px;
+        flex-wrap: wrap;
+      }
+
+      footer figure {
+        margin: 20px;
+        flex: 1;
+        padding: 0 15px;
+        margin: 0 0 30px 0;
+      }
+
+      footer img {
+        display: block;
+        border: 3px solid white;
+      }
+
+      @media screen and (max-width: 899px) {
+        footer figure {
+          flex: none;
+          width: 33.33%;
+        }
+      }
+
+      @media screen and (max-width: 599px) {
+        footer figure {
+          flex: none;
+          width: 50%;
+        }
+      }
+
+      @media screen and (min-width: 1280px) {
+        body {
+        display: grid;
+        grid-template-areas:
+          "header header"
+          "main footer";
+        background-color: gray;
+        color: white;
+        padding: 25px 20px 20px 20px;
+        margin: auto;
+        }
+
+        main img {
+          width: 950px;
+        }
+
+        footer {
+          flex-flow: column;
+          margin: 0;
+        }
+
+        footer figure {
+          width: 100%;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <h1>My Photo Gallery</h1>
+    </header>
+
+    <main>
+      <figure>
+        <img src="https://fpoimg.com/1200x900">
+        <figcaption>Example Photo</figcaption>
+      </figure>
+    </main>
+
+    <footer>
+      <figure>
+        <img src="https://fpoimg.com/1200x900">
+      </figure>
+      <figure>
+        <img src="https://fpoimg.com/1200x900">
+      </figure>
+      <figure>
+        <img src="https://fpoimg.com/1200x900">
+      </figure>
+      <figure>
+        <img src="https://fpoimg.com/1200x900">
+      </figure>
+      <figure>
+        <img src="https://fpoimg.com/1200x900">
+      </figure>
+      <figure>
+        <img src="https://fpoimg.com/1200x900">
+      </figure>
+      <figure>
+        <img src="https://fpoimg.com/1200x900">
+      </figure>
+    </footer>
+  </body>
+</html>
