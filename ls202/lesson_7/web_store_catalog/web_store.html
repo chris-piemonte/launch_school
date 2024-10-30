@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Web Store</title>
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="../reset.css">
+    <style>
+      body {
+        background: #ffd505;
+        font: normal 16px Helvetica, Arial sans-serif;
+        color: #1c242f;
+      }
+
+      header, main {
+        width: 900px;
+        margin: 0 auto 30px auto;
+      }
+
+      header {
+        background: #047ec1;
+        padding: 30px 0;
+        border-bottom-left-radius: 16px;
+        border-bottom-right-radius: 16px;
+      }
+
+      header h1 {
+        padding: 0 25px;
+        font-size: 2.4em;
+        color: white;
+      }
+
+      main {
+        background: #ececec;
+        padding: 25px;
+        box-sizing: border-box;
+    }
+
+      main:after {
+        display: block;
+        clear: both;
+        content: "";
+      }
+
+      main h2 {
+        font-size: 2em;
+        padding: 0 0 25px 0;
+      }
+
+      li {
+        float: left;
+        width: 23.5%;
+        padding: 15px;
+        margin: 0 0 2% 2%;
+        background: white;
+        box-sizing: border-box;
+      }
+
+      li:nth-of-type(4n + 1) {
+        margin-left: 0;
+      }
+
+      h3 {
+        padding: 0 0 5px 0;
+        font-size: 1.2em;
+      }
+
+      figure {
+        width: 100%;
+        height: 160px;
+      }
+
+      img {
+        display: block;
+        width: auto;
+        height: 140px;
+        margin: 0 auto;
+      }
+
+      input[type="checkbox"] {
+        display: none
+      }
+
+      input:checked + figure img {
+        position: absolute;
+        top: 100px;
+        left: 50%;
+        z-index: 1;
+        width: 400px;
+        height: auto;
+        margin: 0 0 0 -200px;
+      }
+
+      input:checked + figure:before {
+        position: fixed;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        z-index: 1;
+        content: "";
+        background: rgba(0, 0, 0, .4);
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <h1>Paramiicio</h1>
+    </header>
+
+    <main>
+      <h2>All Products</h2>
+      <ul>
+        <li>
+          <label>
+            <input type="checkbox">
+            <figure>
+              <img src="images/aurelia.jpg" alt=Aurelia">
+            </figure>
+            <h3>Aurelia</h3>
+            <p>$12.99</p>
+          </label>
+        </li>
+        <li>
+          <label>
+            <input type="checkbox">
+            <figure>
+              <img src="images/polycaryum.jpg" alt=Polycarium">
+            </figure>
+            <h3>Polycarium</h3>
+            <p>$12.99</p>
+          </label>
+        </li>
+        <li>
+          <label>
+            <input type="checkbox">
+            <figure>
+              <img src="images/chlorelligerum.jpg" alt=Chlorelligerum">
+            </figure>
+            <h3>Chlorelligerum</h3>
+            <p>$12.99</p>
+          </label>
+        </li>
+        <li>
+          <label>
+            <input type="checkbox">
+            <figure>
+              <img src="images/sonneborni.jpg" alt=Sonneborni">
+            </figure>
+            <h3>Sonneborni</h3>
+            <p>$12.99</p>
+          </label>
+        </li>
+        <li>
+          <label>
+            <input type="checkbox">
+            <figure>
+              <img src="images/ugandae.jpg" alt=Ugandae">
+            </figure>
+            <h3>Ugandae</h3>
+            <p>$12.99</p>
+          </label>
+        </li>
+        <li>
+          <label>
+            <input type="checkbox">
+            <figure>
+              <img src="images/woodruffi.jpg" alt=Woodruffi">
+            </figure>
+            <h3>Woodruffi</h3>
+            <p>$12.99</p>
+          </label>
+        </li>
+      </ul>
+    </main>
+  </body>
+</html>
