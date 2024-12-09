@@ -29,7 +29,7 @@ let longText = 'Four score and seven years ago our fathers brought forth' +
   ' earth.';
 
 function longestSentence(text) {
-  const sentences = text.match(/\b.+?[.!?]+/g);
+  const sentences = text.match(/[^ ].+?[.!?]+/g);
   const sentencesAndWordCounts = sentenceWordCounts(sentences);
   const longestWordCount = getLongestWordCount(sentencesAndWordCounts);
 
@@ -40,7 +40,7 @@ function longestSentence(text) {
 function sentenceWordCounts(sentences) {
   const sentencesAndWordCounts = {};
   sentences.forEach(sentence => {
-    sentencesAndWordCounts[sentence] = sentence.match(/(\b[^ .!?]+\b|-+)/g).length;
+    sentencesAndWordCounts[sentence] = sentence.match(/[^ .!?]+[.!?]?/g).length;
   });
 
   return sentencesAndWordCounts;
@@ -55,9 +55,13 @@ function getLongestWordCount(sentencesAndWordCounts) {
 function logSentence(sentences, wordCount) {
   for (const sentence in sentences) {
     if (sentences[sentence] === wordCount) {
-      console.log(sentence + '\n');
+      return console.log(sentence + '\n');
     }
   }
 }
 
 longestSentence(longText);
+
+longestSentence("Hello ,,, there! What? Hello, there.");
+
+longestSentence("$#@*$%, he mumbled. What's up?");

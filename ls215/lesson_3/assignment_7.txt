@@ -1,0 +1,94 @@
+Problem 1
+
+A distinct string is a string that is present only once in an array.
+
+Given an array of strings, `arr`, and an integer, k, return the kth distinct string present in arr. If there are fewer than k distinct strings, return an empty string "".
+
+Note that the result string is the one encountered earliest in the array.
+
+Example:
+distinctString(["d","b","c","b","c","a"], 2); // "a"
+
+- Will there be non-string elements in the array?
+  - Should non-string numbers and symbols be treated as strings?
+  - Do strings in nested arrays count as possible distinct strings?
+    - Do those strings mean a non-nested string isn't distince?
+- Does capitalization matter?
+- Will there be a possible sparse array?
+- Should an empty array return ''?
+- If either argument is missing what should be returned?
+  - What should I do if there are more than 2 arguments?
+- Will the first argument always be an array and the second always an integer? If not, what shoudl I do?
+- Will the second argument ever be 0? If so, what should I do?
+- Will the second argument ever be negative? If so, what should I do?
+- Can the array contain any number of elements?
+- Can the array ever be empty?
+- Can the strings be of any length?
+
+
+Problem 2
+Given an array of integers, `nums`, return the third largest number in the array. If the third largest number does not exist, return the greatest number.
+
+You are not allowed to sort the array.
+
+Example:
+thirdMax([3, 2, 1]); // 1
+
+- Will there always be an argument? What do I do if not?
+- Can there be more than one argument? If so, how do I handle?
+- Can the array contain less tahn 3 elements? If so, how do I handle? Return the greaterst number? Does that include floats?
+- Can there be more than 3?
+- Will there be other elements other than intergers? How to handle?
+- What should I return if there are no integers or numbers in the array?
+- Could the input be a sparse array? If so, how do I handle?
+- Could the array contain negative numbers or 0?? If so, how to handle?
+- Could the array contain NaN?
+- Couul the array contain Infinity or -Infinity?
+- Could the array have repeated numbers? Should they count once or twice for determining 3rd largest number?
+
+
+Problem 3
+Write a function, `primeNumberPrinter`, that prints all prime numbers present as substrings in a given string.
+
+Example:
+primeNumberPrinter("a4bc2k13d"); // [2, 13]
+
+- If there is a - in the string does it make a number following it a negative number?
+  - If so, should those be included?
+- Does the return array have to be in any particular order?
+- Do multiple numbers in a row in the string counnt as multple numbers?
+  - i.e., does '37' count as 3, 7, and 37?
+- Will there ever be no argument? If so, how to handle?
+- Will there ever be more than one argument? If so, how to handle?
+- If the argument is a non-string, how to handle?
+- If there are decimals in the string, does it make numbers preceeding it or following it floats?
+- Should leading 0s be included in the substring?
+- Could there be an empty string? If so should I return an empty array?
+- If she string doesn't contain any prime numbers should I return an empty arra?
+
+
+Problem 4
+​Write a function that takes a two-dimensional array as the argument and turns it into a flat array with all duplicated elements removed. Treat numbers and number strings (e.g., 1 and '1') as duplicates, and keep the one that comes first in the result.
+
+Example:
+flattenAndUnique([]); // []
+flattenAndUnique([[1, 2, 3], ['3', 4, 5, 'a']]); // [1, 2, 3, 4, 5, 'a']
+
+- Will the argument always be a 2 dimensional array?
+  - If argument isn't an array or is missing what should I do?
+- Can there be more than 1 argument? How do I handle?
+- Could the argument be an already flat array? Should I still remove duplicates?
+- Will the arrays only contain numbers and strings? What sould I do f it doesn't?
+  - Should I treat floats the same as numbers?
+- Can there be negative numbers?
+  - Can there be negative representations of strings?
+  - Should I remove duplicate negative numebrs
+- Should I keep the form of a duplicate (sring or number) from the 1st argument if it doesn't match second argument?
+- Can there be duplicates within the same sub-array? How do I handle?
+- Can there be more than 2 sub-arrays in the argument array?
+  - If so, should they all be flattened?
+- Should the order of the flattened array be the same as the order of elements in the sub-arrays from right to left?
+- Will all elements of the array arguments be arrays themselvs? If not, what should I do?
+- Can the sub arrays contain NaN values? If so, should I remove duplicate NaNs?
+- Can the sub-arrays contain objects or arrays? If so, how to handle?
+- Can the array be sparse? If so, how to handle missing arguments?
