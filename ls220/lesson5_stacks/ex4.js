@@ -106,7 +106,6 @@ function inorderTraversal(root) {
 
 
 
-
 function inorderTraversal(root) {
   const result = [];
   const stack = [];
@@ -126,6 +125,27 @@ function inorderTraversal(root) {
   }
 
   return result;
+}
+
+
+
+function inorderTraversal(root) {
+  const results = [];
+  const stack = [];
+  let curr = root;
+
+  while (stack.length > 0 || curr !== null) {
+    while (curr !== null) {
+      stack.push(curr);
+      curr = curr.left;
+    }
+
+    curr = stack.pop();
+    results.push(curr.val);
+    curr = curr.right;
+  }
+
+  return results;
 }
 
 // Test Cases:

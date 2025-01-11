@@ -45,11 +45,35 @@ function createFrequencyList(head) {
     // }
 
     // frequency[curr.val] += 1;
-    frequency[curr.val] = frequency[curr.val] + 1 ||1;
+    frequency[curr.val] = frequency[curr.val] + 1 || 1;
     curr = curr.next;
   }
 
   return createLinkedList(Object.values(frequency));
+}
+
+function createFrequencyList(head) {
+  const frequencies = {};
+
+  while (head) {
+    if (!frequencies[head.val]) {
+      frequencies[head.val] = 0;
+    }
+
+    frequencies[head.val] += 1;
+    head = head.next;
+  }
+
+  values = Object.values(frequencies);
+  let dummy = new ListNode(0);
+  let curr = dummy;
+
+  for (let num of values) {
+    curr.next = new ListNode(num);
+    curr = curr.next;
+  }
+
+  return dummy.next;
 }
 
 // Test cases

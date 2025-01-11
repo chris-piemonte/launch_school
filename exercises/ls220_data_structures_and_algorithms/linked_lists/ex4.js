@@ -85,6 +85,34 @@ function mergeSortedLists(list1, list2) {
   return dummy.next;
 }
 
+function mergeSortedLists(listA, listB) {
+  if (!listA && !listB) return listA;
+  if (!listA && listB) return listB;
+  if (!listB && listA) return listA;
+
+  let dummy = new ListNode(0);
+  let curr = dummy;
+  let pointerA = listA;
+  let pointerB = listB;
+
+  while (pointerA && pointerB) {
+    if (pointerA.val <= pointerB.val) {
+      curr.next = pointerA;
+      curr = curr.next;
+      pointerA = pointerA.next
+    } else {
+      curr.next = pointerB;
+      curr = curr.next;
+      pointerB = pointerB.next
+    }
+
+    if (!pointerA) curr.next = pointerB;
+    if (!pointerB) curr.next = pointerA;
+  }
+
+  return dummy.next;
+}
+
 let list1 = createLinkedList([1, 3, 5]);
 let list2 = createLinkedList([2, 4, 6]);
 printLinkedList(mergeSortedLists(list1, list2)); // Expected: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> null
