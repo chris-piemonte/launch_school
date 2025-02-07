@@ -1,3 +1,5 @@
+'use strict';
+
 const rlsync = require('readline-sync');
 const shuffle = require('shuffle-array');
 
@@ -9,26 +11,26 @@ class Game {
   }
 
   start() {
-    this.displayIntro();
-    this.playGame();
-    this.exitGame();
+    this.#displayIntro();
+    this.#playGame();
+    this.#exitGame();
   }
 
-  displayIntro() {
+  #displayIntro() {
     rlsync.question("Welcome to twenty-one. Press enter to start.");
   }
 
-  playGame() {
+  #playGame() {
     while (true) {
-      this.resetGame();
-      this.humanTurn();
-      if (!this.human.busted()) this.dealerTurn();
-      this.displayWinner();
-      if (this.playAgain() === 'n') break;
+      this.#resetGame();
+      this.#humanTurn();
+      if (!this.human.busted()) this.#dealerTurn();
+      this.#displayWinner();
+      if (this.#playAgain() === 'n') break;
     }
   }
 
-  dealInitialCards() {
+  #dealInitialCards() {
     this.deck.dealCard(this.dealer);
     this.deck.dealCard(this.dealer);
     this.deck.dealCard(this.human);
@@ -36,13 +38,13 @@ class Game {
     this.dealer.hideFIrstCard();
   }
 
-  humanTurn() {
+  #humanTurn() {
     while (true) {
-      this.displayHands();
+      this.#displayHands();
       const choice = this.human.hitOrStay();
       if (choice === 'hit') {
         this.deck.dealCard(this.human);
-        this.displayHands();
+        this.#displayHands();
         if (this.human.busted()) {
           rlsync.question(`Your total is ${this.human.handTotal}, you busted!\n\nPress enter to continue.`);
           this.dealer.revealFirstCard();
@@ -54,19 +56,19 @@ class Game {
     }
   }
 
-  dealerTurn() {
+  #dealerTurn() {
     this.dealer.revealFirstCard();
-    this.displayHands();
+    this.#displayHands();
     while (this.dealer.handTotal < 17) {
       rlsync.question('The dealer must hit when under 17.\n\nPress enter to continue.');
       this.deck.dealCard(this.dealer);
-      this.displayHands();
+      this.#displayHands();
     }
 
-    this.endDealerTurn();
+    this.#endDealerTurn();
   }
 
-  endDealerTurn() {
+  #endDealerTurn() {
     if (this.dealer.busted()) {
       rlsync.question('TThe dealer busted!\n\nPress enter to continue.');
     } else {
@@ -74,16 +76,16 @@ class Game {
     }
   }
 
-  displayHands() {
+  #displayHands() {
     console.clear();
-    this.displayHand(this.dealer);
-    this.displayScore(this.dealer);
-    this.displayHand(this.human);
-    this.displayScore(this.human);
+    this.#displayHand(this.dealer);
+    this.#displayScore(this.dealer);
+    this.#displayHand(this.human);
+    this.#displayScore(this.human);
   }
 
-  displayHand(player) {
-    const rows = {1: '', 2: '', 3: '', 4: '', 5: '', 6: '', 7: ''}
+  #displayHand(player) {
+    const rows = {1: '', 2: '', 3: '', 4: '', 5: '', 6: '', 7: ''};
 
     player.hand.forEach(card => {
       if (!card.hidden) {
@@ -97,9 +99,9 @@ class Game {
         rows[4] += `|   ${card.suit}   | `;
         rows[5] += `|       | `;
         if (card.number === '10') {
-          rows[6] += `|     ${card.number}| `
-        } else {
-          rows[6] += `|      ${card.number}| `
+          rows[6] += `|     ${card.number}| `;
+        } else {;
+          rows[6] += `|      ${card.number}| `;
         }
         rows[7] += `+-------+ `;
       }
@@ -110,34 +112,34 @@ class Game {
     }
   }
 
-  displayScore(player) {
+  #displayScore(player) {
     if (player instanceof Dealer) {
       if (player.hand[0].hidden) {
-        console.log(`The dealer's total is ${player.hand[1].value} but their second card is unknown.`)
+        console.log(`The dealer's total is ${player.hand[1].value} but their second card is unknown.`);
       } else {
-        console.log(`The dealer's total is ${player.handTotal}`)
+        console.log(`The dealer's total is ${player.handTotal}`);
       }
     } else {
-      console.log(`Your total is ${player.handTotal}`)
+      console.log(`Your total is ${player.handTotal}`);
     }
     console.log();
   }
 
-  displayWinner() {
-    this.displayHands();
+  #displayWinner() {
+    this.#displayHands();
 
     if (this.human.busted()) {
       console.log('You busted, the dealer wins!\n');
     } else if (this.dealer.busted()) {
       console.log('The dealer busted, you win!\n');
     } else {
-      this.determineWinner();
+      this.#determineWinner();
     }
 
     rlsync.question('Press enter to continue');
   }
 
-  determineWinner() {
+  #determineWinner() {
     const humanTotal = this.human.handTotal;
     const dealerTotal = this.dealer.handTotal;
 
@@ -150,7 +152,7 @@ class Game {
     }
   }
 
-  playAgain() {
+  #playAgain() {
 
     let choice;
     while (!['y', 'n'].includes(choice)) {
@@ -161,26 +163,26 @@ class Game {
     return choice;
   }
 
-  resetGame() {
+  #resetGame() {
     this.deck = new Deck();
     this.human.resetHand();
     this.dealer.resetHand();
-    this.dealInitialCards();
+    this.#dealInitialCards();
 
   }
 
-  exitGame() {
-    console.log('Thanks for playing, goodbye!')
+  #exitGame() {
+    console.log('Thanks for playing, goodbye!');
   }
 }
 
 class Deck {
   constructor() {
-    this.cards = this.createDeck();
+    this.cards = this.#createDeck();
     shuffle(this.cards);
   }
 
-  createDeck() {
+  #createDeck() {
     const cards = [];
 
     Card.NUMBERS.forEach(num => {
@@ -193,13 +195,13 @@ class Deck {
   }
 
   dealCard(player) {
-    const card = this.cards.pop()
+    const card = this.cards.pop();
     player.hand.push(card);
     player.handTotal += card.value;
-    this.checkAces(player);
+    this.#checkAces(player);
   }
 
-  checkAces(player) {
+  #checkAces(player) {
     if (player.handTotal > 21) {
       let aces = player.hand.filter(card => card.number === 'A' && card.value === 11);
       while (player.handTotal > 21 && aces.length > 0) {
@@ -214,14 +216,44 @@ class Deck {
 class Card {
   static NUMBERS = ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'K', 'Q', 'A'];
   static SUITS = ["\u2660", "\u2663", "\u2665", "\u2666"];
+
+  #number
+  #suit
+  #value
+  #hidden
+
   constructor(number, suit, hidden = false) {
-    this.number = number;
-    this.suit = suit;
-    this.value = this.cardValue(number)
-    this.hidden = hidden;
+    this.#number = number;
+    this.#suit = suit;
+    this.#value = this.#cardValue(number);
+    this.#hidden = hidden;
   }
 
-  cardValue(number) {
+  get number() {
+    return this.#number;
+  }
+
+  get suit() {
+    return this.#suit;
+  }
+
+  get value() {
+    return this.#value;
+  }
+
+  get hidden() {
+    return this.#hidden;
+  }
+
+  set value(num) {
+    this.#value = num;
+  }
+
+  set hidden(option) {
+    this.#hidden = option;
+  }
+
+  #cardValue(number) {
     let num = Number(number);
 
     if (num) {
@@ -243,9 +275,23 @@ class Card {
 }
 
 class Player {
-  constructor() {
-    this.hand;
-    this.handTotal;
+  #hand;
+  #handTotal;
+
+  get hand() {
+    return this.#hand;
+  }
+
+  get handTotal() {
+    return this.#handTotal;
+  }
+
+  set hand(newHand) {
+    this.#hand = newHand;
+  }
+
+  set handTotal(newTotal) {
+    this.#handTotal = newTotal;
   }
 
   busted() {
@@ -259,10 +305,6 @@ class Player {
 }
 
 class Dealer extends Player {
-  constructor() {
-    super();
-  }
-
   hideFIrstCard() {
     this.hand[0].hide();
   }
@@ -273,10 +315,6 @@ class Dealer extends Player {
 }
 
 class Human extends Player {
-  constructor() {
-    super();
-  }
-
   hitOrStay() {
     return rlsync.question("Will you hit or stay?: ");
   }
